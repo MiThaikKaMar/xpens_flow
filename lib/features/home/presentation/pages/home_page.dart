@@ -18,7 +18,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SafeArea(child: Column(children: [])),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Text(
+              "Start from Home page and Will keep doing for transactions feature!",
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
