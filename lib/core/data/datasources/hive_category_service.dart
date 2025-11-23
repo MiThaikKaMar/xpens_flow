@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:xpens_flow/features/onboarding/data/models/category_model.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
 
 class HiveCategoryService {
   final Box<CategoryModel> _box = Hive.box<CategoryModel>('categories');

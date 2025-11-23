@@ -1,11 +1,12 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
+import 'package:xpens_flow/features/transactions/data/tables/transaction_table.dart';
 
 class DatabaseHelper {
   static DatabaseHelper? _instance;
   static Database? _database;
-  final int _databaseVersion = 1;
+  final int _databaseVersion = 2;
 
   DatabaseHelper._();
 
@@ -31,6 +32,9 @@ class DatabaseHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     debugPrint('Creating database tables...');
+
+    //transactions table
+    await db.execute(TransactionTable.createTableSQL);
 
     debugPrint('Database tables created.');
   }

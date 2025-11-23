@@ -8,7 +8,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // correct initState (synchronous)
   @override
   void initState() {
     super.initState();
@@ -16,11 +15,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SafeArea(
-        child: Column(children: [Text("Adding bottom navigation bar!")]),
-      ),
-    );
+    return Scaffold(body: Center(child: Text("Home Page")));
   }
 }

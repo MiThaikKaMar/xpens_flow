@@ -6,21 +6,31 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xpens_flow/app/router/app_router.dart';
 import 'package:xpens_flow/core/common/init_variables.dart';
-import 'package:xpens_flow/core/data/db/database_helper.dart';
-import 'package:xpens_flow/features/onboarding/data/hive/hive_category_service.dart';
-import 'package:xpens_flow/core/helpers/shared_preferences_helper.dart';
-import 'package:xpens_flow/features/onboarding/data/models/category_model.dart';
+import 'package:xpens_flow/core/data/datasources/database_helper.dart';
+import 'package:xpens_flow/core/data/datasources/hive_category_service.dart';
+import 'package:xpens_flow/core/data/datasources/shared_preferences_helper.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
+import 'package:xpens_flow/core/data/repositories/app_settings_repository_impl.dart';
+import 'package:xpens_flow/core/domain/repositories/app_settings_repository.dart';
+import 'package:xpens_flow/core/domain/usecases/get_current_currency.dart';
+import 'package:xpens_flow/core/domain/usecases/get_selected_categories.dart';
+import 'package:xpens_flow/core/ui/bloc/app_settings_bloc.dart';
 import 'package:xpens_flow/features/onboarding/data/repositories/onboarding_repository_impl.dart';
 import 'package:xpens_flow/features/onboarding/domain/repositories/onboarding_repository.dart';
 import 'package:xpens_flow/features/onboarding/domain/usecases/complete_onboarding.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
+import 'package:xpens_flow/features/transactions/data/datasources/transaction_local_data_source.dart';
+import 'package:xpens_flow/features/transactions/data/datasources/transaction_local_data_source_impl.dart';
+import 'package:xpens_flow/features/transactions/data/repositories/transaction_repository_impl.dart';
+import 'package:xpens_flow/features/transactions/domain/repositories/transaction_repository.dart';
+import 'package:xpens_flow/features/transactions/domain/usecases/add_transaction.dart';
+import 'package:xpens_flow/features/transactions/domain/usecases/list_transactions.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
-  final appRouter = AppRouter().router;
-  serviceLocator.registerLazySingleton<GoRouter>(() => appRouter);
-
+  // SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
   serviceLocator.registerLazySingleton(() => sharedPreferences);
 
@@ -28,11 +38,8 @@ Future<void> initDependencies() async {
     SharedPreferencesHelperImpl(serviceLocator<SharedPreferences>()),
   );
 
-  serviceLocator.registerSingleton<DatabaseHelper>(DatabaseHelper());
-
   // Init Hive
 
-  // Get the application documents directory
   final appDocumentDirectory = await getApplicationDocumentsDirectory();
   final path = appDocumentDirectory.path;
   Hive
@@ -41,24 +48,104 @@ Future<void> initDependencies() async {
   // Open the categories box
   await Hive.openBox<CategoryModel>('categories');
 
-  _initOnboarding();
-}
-
-void _initOnboarding() {
   HiveCategoryService hiveCategoryService = HiveCategoryService();
 
   serviceLocator.registerSingleton<HiveCategoryService>(hiveCategoryService);
 
+  //Routers
+
+  final appRouter = AppRouter().router;
+  serviceLocator.registerLazySingleton<GoRouter>(() => appRouter);
+
+  serviceLocator.registerSingleton<DatabaseHelper>(DatabaseHelper());
+
+  _initOnboarding();
+  _coreAppSettings();
+  _transaction();
+}
+
+void _transaction() {
+  //data source
+  serviceLocator.registerLazySingleton<TransactionLocalDataSource>(
+    () => TransactionLocalDataSourceImpl(
+      databaseHelper: serviceLocator<DatabaseHelper>(),
+    ),
+  );
+
+  //repository
+  serviceLocator.registerFactory<TransactionRepository>(
+    () => TransactionRepositoryImpl(
+      localDataSource: serviceLocator<TransactionLocalDataSource>(),
+    ),
+  );
+
+  //usecase
+  serviceLocator.registerFactory(
+    () => AddTransaction(
+      transactionRepository: serviceLocator<TransactionRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory(
+    () => ListTransactions(
+      transactionRepository: serviceLocator<TransactionRepository>(),
+    ),
+  );
+
+  //bloc
+  serviceLocator.registerLazySingleton<TransactionFeedBloc>(
+    () => TransactionFeedBloc(
+      addTransaction: serviceLocator<AddTransaction>(),
+      listTransactions: serviceLocator<ListTransactions>(),
+    ),
+  );
+}
+
+void _coreAppSettings() {
+  //repository
+  serviceLocator.registerFactory<AppSettingsRepository>(
+    () => AppSettingsRepositoryImpl(
+      prefHelper: serviceLocator<SharedPreferencesHelper>(),
+      hiveService: serviceLocator<HiveCategoryService>(),
+    ),
+  );
+
+  //usecase
+  serviceLocator.registerFactory<GetCurrentCurrency>(
+    () => GetCurrentCurrency(
+      appSettingsRepository: serviceLocator<AppSettingsRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<GetSelectedCategories>(
+    () => GetSelectedCategories(
+      appSettingsRepository: serviceLocator<AppSettingsRepository>(),
+    ),
+  );
+
+  //bloc
+  serviceLocator.registerLazySingleton<AppSettingsBloc>(
+    () => AppSettingsBloc(
+      getCurrentCurrency: serviceLocator<GetCurrentCurrency>(),
+      getSelectedCategories: serviceLocator<GetSelectedCategories>(),
+    ),
+  );
+}
+
+void _initOnboarding() {
+  //repository
   serviceLocator.registerFactory<OnboardingRepository>(
     () => OnboardingRepositoryImpl(serviceLocator<HiveCategoryService>()),
   );
 
+  //usecase
   serviceLocator.registerFactory<CompleteOnboarding>(
     () => CompleteOnboarding(
       onboardingRepository: serviceLocator<OnboardingRepository>(),
     ),
   );
 
+  //bloc
   serviceLocator.registerLazySingleton<CategoryCubit>(
     () => CategoryCubit(
       completeOnboarding: serviceLocator<CompleteOnboarding>(),

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/router/routes.dart';
 import 'package:xpens_flow/core/common/app_strings.dart';
-import 'package:xpens_flow/features/onboarding/data/models/category_model.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
 import 'package:xpens_flow/features/onboarding/presentation/widgets/category_card.dart';
 
@@ -97,7 +97,7 @@ class _CategoriesSuggestPageState extends State<CategoriesSuggestPage> {
               child: ElevatedButton(
                 onPressed: () {
                   context.read<CategoryCubit>().onCompleteOnboarding();
-                  context.push(Routes.home);
+                  context.go(Routes.home);
                 },
                 child: Text(AppStrings.catBtComfirmCate),
               ),

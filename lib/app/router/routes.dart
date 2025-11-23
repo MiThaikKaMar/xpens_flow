@@ -5,6 +5,21 @@ class Routes {
   static String onboardingSetup = "/onboarding_first_run_setup";
   static String onboardingCatSuggest = "/onboarding_categores_suggest";
 
+  //Main
+  static String main = "/main";
+
   // Home
   static String home = "/dashboard";
+
+  //Accounts
+  static String accounts = "/accounts";
+
+  //Transactions
+  static String transactions = "/transactions";
+
+  // Budgets
+  static String budgets = "/budgets";
+
+  //more
+  static String more = "/more";
 }

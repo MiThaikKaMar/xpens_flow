@@ -6,8 +6,8 @@ import 'package:vibration/vibration.dart';
 import 'package:xpens_flow/app/router/routes.dart';
 import 'package:xpens_flow/core/common/app_strings.dart';
 import 'package:xpens_flow/core/common/init_variables.dart';
-import 'package:xpens_flow/core/helpers/haptic_feedback_helper.dart';
-import 'package:xpens_flow/core/helpers/shared_preferences_helper.dart';
+import 'package:xpens_flow/core/data/datasources/haptic_feedback_helper.dart';
+import 'package:xpens_flow/core/data/datasources/shared_preferences_helper.dart';
 import 'package:xpens_flow/features/onboarding/presentation/widgets/theme_list_item.dart';
 
 class FirstRunSetupPage extends StatefulWidget {
@@ -156,7 +156,7 @@ class _FirstRunSetupPageState extends State<FirstRunSetupPage> {
               }
 
               debugPrint(
-                "${widget.prefsHelper.getString(AppStrings.prefCurrentCurrency)} + ${widget.prefsHelper.getString(AppStrings.prefSelectedTheme)} + ${widget.prefsHelper.getBool(AppStrings.prefIsHapticOn)}",
+                "${widget.prefsHelper.getString(AppStrings.sfCurrentCurrency)} + ${widget.prefsHelper.getString(AppStrings.sfSelectedTheme)} + ${widget.prefsHelper.getBool(AppStrings.sfIsHapticOn)}",
               );
               context.push(Routes.onboardingCatSuggest);
             },
@@ -173,8 +173,8 @@ class _FirstRunSetupPageState extends State<FirstRunSetupPage> {
     bool isHapticOn,
   ) {
     widget.prefsHelper
-      ..setString(AppStrings.prefCurrentCurrency, currencySymbol)
-      ..setString(AppStrings.prefSelectedTheme, selectedTheme)
-      ..setBool(AppStrings.prefIsHapticOn, isHapticOn);
+      ..setString(AppStrings.sfCurrentCurrency, currencySymbol)
+      ..setString(AppStrings.sfSelectedTheme, selectedTheme)
+      ..setBool(AppStrings.sfIsHapticOn, isHapticOn);
   }
 }

@@ -4,14 +4,25 @@ import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/di/init_dependencies.dart';
 import 'package:xpens_flow/core/common/app_strings.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
+
+import '../core/ui/bloc/app_settings_bloc.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized;
+  WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => serviceLocator<CategoryCubit>())],
+      providers: [
+        BlocProvider(create: (_) => serviceLocator<CategoryCubit>()),
+        BlocProvider(
+          create: (_) =>
+              serviceLocator<AppSettingsBloc>()..add(LoadAppSettingsEvent()),
+        ),
+        BlocProvider(create: (_) => serviceLocator<TransactionFeedBloc>()),
+      ],
+
       child: const XpensFlow(),
     ),
   );
