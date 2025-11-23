@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:xpens_flow/features/onboarding/data/models/category_model.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/features/onboarding/domain/usecases/complete_onboarding.dart';
 
 part 'category_state.dart';
@@ -62,6 +62,6 @@ class CategoryCubit extends Cubit<CategoryState> {
       SelectedCatParams(selectedCatList),
     );
 
-    res.fold((l) => debugPrint(l), (r) => debugPrint(r.message));
+    res.fold((l) => debugPrint(l.message), (r) => debugPrint(r));
   }
 }

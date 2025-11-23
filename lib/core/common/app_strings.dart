@@ -7,11 +7,12 @@ class AppStrings {
   static String bSkip = "Skip";
   static String getStarted = "Get Started";
   static String unknown = "Unknown";
+  static String unexpectedError = "Unexpected Error occur!";
 
   //SharedPreferences
-  static String prefCurrentCurrency = "current_currency";
-  static String prefSelectedTheme = "selected_theme";
-  static String prefIsHapticOn = "is_haptic_on";
+  static String sfCurrentCurrency = "current_currency";
+  static String sfSelectedTheme = "selected_theme";
+  static String sfIsHapticOn = "is_haptic_on";
 
   //Welcome Page
   static String welcomeDescription = "Private. Effortless. On your device.";

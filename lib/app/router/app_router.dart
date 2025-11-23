@@ -1,17 +1,65 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/di/init_dependencies.dart';
 import 'package:xpens_flow/app/router/routes.dart';
-import 'package:xpens_flow/core/helpers/shared_preferences_helper.dart';
+import 'package:xpens_flow/core/data/datasources/hive_category_service.dart';
+import 'package:xpens_flow/core/data/datasources/shared_preferences_helper.dart';
+import 'package:xpens_flow/features/accounts/presentation/pages/accounts_page.dart';
+import 'package:xpens_flow/features/budgets/presentation/pages/budgets_overview_page.dart';
 import 'package:xpens_flow/features/home/presentation/pages/home_page.dart';
+import 'package:xpens_flow/features/main/presentation/pages/main_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/carousel_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/categories_suggest_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/first_run_setup_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.dart';
+import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
+
+import '../../core/common/app_strings.dart';
+import '../../features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
+
+final GlobalKey<NavigatorState> _dashboardNavigatorKey =
+    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _accountsNavigatorKey =
+    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _transactionsNavigatorKey =
+    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _budgetsNavigatorKey =
+    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
     initialLocation: Routes.welcome,
+    redirect: (BuildContext context, GoRouterState state) {
+      // Check SharedPreferences directly
+      final prefsHelper = serviceLocator<SharedPreferencesHelper>();
+
+      // Check if currency and categories are set
+      // Adjust these methods based on your SharedPreferencesHelper implementation
+      final hasCurrency =
+          prefsHelper.getString(AppStrings.sfCurrentCurrency) != null;
+
+      final hiveService = serviceLocator<HiveCategoryService>();
+      final hasCategories = hiveService.getAllCategories().isNotEmpty;
+
+      final isOnWelcome = state.matchedLocation == Routes.welcome;
+      final isOnOnboarding = state.matchedLocation.startsWith('/onboarding');
+      final hasValidSettings = hasCurrency && hasCategories;
+
+      // If has valid settings and on welcome/onboarding, redirect to home
+      if (hasValidSettings && (isOnWelcome || isOnOnboarding)) {
+        return Routes.home;
+      }
+
+      // If no valid settings and trying to access main app, redirect to welcome
+      if (!hasValidSettings && !isOnWelcome && !isOnOnboarding) {
+        return Routes.welcome;
+      }
+
+      return null; // No redirect
+    },
     routes: [
       GoRoute(path: Routes.welcome, builder: (context, state) => WelcomePage()),
       GoRoute(
@@ -30,7 +78,64 @@ class AppRouter {
           categoryCubit: serviceLocator<CategoryCubit>(),
         ),
       ),
-      GoRoute(path: Routes.home, builder: (context, state) => HomePage()),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainPage(navigationShell: navigationShell);
+        },
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _dashboardNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.home,
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _accountsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.accounts,
+                builder: (context, state) => const AccountsPage(),
+              ),
+              // GoRoute(
+              //   path: Routes.subpage,
+              //   builder: (context, state) => const SubPage(),
+              // ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _transactionsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.transactions,
+                builder: (context, state) => TransactionsFeedPage(
+                  transactionFeedBloc: serviceLocator<TransactionFeedBloc>(),
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _budgetsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.budgets,
+                builder: (context, state) => const BudgetsOverviewPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _moreNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.more,
+                builder: (context, state) => const MorePage(),
+              ),
+            ],
+          ),
+        ],
+      ),
     ],
   );
 }

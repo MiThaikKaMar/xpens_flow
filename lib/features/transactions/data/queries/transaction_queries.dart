@@ -1,1 +1,94 @@
 // optional complex SQL strings
+
+import 'package:sqflite/sqflite.dart';
+import 'package:xpens_flow/features/transactions/data/tables/transaction_table.dart';
+
+import '../models/transaction_model.dart';
+
+class TransactionQueries {
+  final Database db;
+
+  TransactionQueries(this.db);
+
+  //Insert
+  Future<int> insert(TransactionModel transaction) async {
+    return await db.insert(
+      TransactionTable.tableName,
+      transaction.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  //Get all transactions
+  Future<List<TransactionModel>> getAll() async {
+    final List<Map<String, dynamic>> maps = await db.query(
+      TransactionTable.tableName,
+      orderBy: '${TransactionTable.columnDateTime} DESC',
+    );
+    //Sort the results by column_name in descending order.
+
+    return maps.map((map) => TransactionModel.fromMap(map)).toList();
+  }
+
+  //Get transaction by ID
+  Future<TransactionModel?> getById(int id) async {
+    final List<Map<String, dynamic>> maps = await db.query(
+      TransactionTable.tableName,
+      where: '${TransactionTable.columnId} = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+
+    if (maps.isEmpty) return null;
+    return TransactionModel.fromMap(maps.first);
+  }
+
+  //Update transaction
+  Future<int> update(TransactionModel transaction) async {
+    return await db.update(
+      TransactionTable.tableName,
+      transaction.toMap(),
+      where: '${TransactionTable.columnId} =?',
+      whereArgs: [transaction.id],
+    );
+  }
+
+  //Delete transaction
+  Future<int> delete(int id) async {
+    return await db.delete(
+      TransactionTable.tableName,
+      where: '${TransactionTable.columnId} =?',
+      whereArgs: [id],
+    );
+  }
+
+  //Get transactions by category
+  Future<List<TransactionModel>> getByCategory(String category) async {
+    final List<Map<String, dynamic>> maps = await db.query(
+      TransactionTable.tableName,
+      where: '${TransactionTable.columnCategory} = ?',
+      whereArgs: [category],
+      orderBy: '${TransactionTable.columnDateTime} DESC',
+    );
+
+    return maps.map((map) => TransactionModel.fromMap(map)).toList();
+  }
+
+  //Get by date range
+  Future<List<TransactionModel>> getByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    final List<Map<String, dynamic>> maps = await db.query(
+      TransactionTable.tableName,
+      where: '${TransactionTable.columnDateTime} BETWEEN ? AND ?',
+      whereArgs: [
+        startDate.millisecondsSinceEpoch,
+        endDate.millisecondsSinceEpoch,
+      ],
+      orderBy: '${TransactionTable.columnDateTime} DESC',
+    );
+
+    return maps.map((map) => TransactionModel.fromMap(map)).toList();
+  }
+}

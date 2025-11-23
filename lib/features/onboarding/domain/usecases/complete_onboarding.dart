@@ -2,8 +2,8 @@
 import 'package:fpdart/fpdart.dart';
 
 import 'package:xpens_flow/core/domain/usecases/usecase.dart';
-import 'package:xpens_flow/core/error/failure.dart';
-import 'package:xpens_flow/features/onboarding/data/models/category_model.dart';
+import 'package:xpens_flow/core/error/failures.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/features/onboarding/domain/repositories/onboarding_repository.dart';
 
 class CompleteOnboarding extends AsyncUsecase<String, SelectedCatParams> {
@@ -13,7 +13,7 @@ class CompleteOnboarding extends AsyncUsecase<String, SelectedCatParams> {
     : _onboardingRepository = onboardingRepository;
 
   @override
-  Future<Either<String, Failure>> call(SelectedCatParams params) async {
+  Future<Either<Failure, String>> call(SelectedCatParams params) async {
     return _onboardingRepository.saveSelectedCategories(params.selectedCatList);
   }
 }

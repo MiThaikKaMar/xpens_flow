@@ -1,9 +1,9 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:xpens_flow/core/error/failure.dart';
-import 'package:xpens_flow/features/onboarding/data/models/category_model.dart';
+import 'package:xpens_flow/core/error/failures.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
 
 abstract interface class OnboardingRepository {
-  Future<Either<String, Failure>> saveSelectedCategories(
+  Future<Either<Failure, String>> saveSelectedCategories(
     List<CategoryModel> catList,
   );
 }

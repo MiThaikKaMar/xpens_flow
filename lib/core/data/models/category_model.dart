@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-part 'category_model.g.dart';
+part '../../../features/onboarding/data/models/category_model.g.dart';
 
 @HiveType(typeId: 1)
 class CategoryModel {
