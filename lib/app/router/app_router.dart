@@ -32,34 +32,34 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 class AppRouter {
   final GoRouter router = GoRouter(
     initialLocation: Routes.welcome,
-    redirect: (BuildContext context, GoRouterState state) {
-      // Check SharedPreferences directly
-      final prefsHelper = serviceLocator<SharedPreferencesHelper>();
+    // redirect: (BuildContext context, GoRouterState state) {
+    //   // Check SharedPreferences directly
+    //   final prefsHelper = serviceLocator<SharedPreferencesHelper>();
 
-      // Check if currency and categories are set
-      // Adjust these methods based on your SharedPreferencesHelper implementation
-      final hasCurrency =
-          prefsHelper.getString(AppStrings.sfCurrentCurrency) != null;
+    //   // Check if currency and categories are set
+    //   // Adjust these methods based on your SharedPreferencesHelper implementation
+    //   final hasCurrency =
+    //       prefsHelper.getString(AppStrings.sfCurrentCurrency) != null;
 
-      final hiveService = serviceLocator<HiveCategoryService>();
-      final hasCategories = hiveService.getAllCategories().isNotEmpty;
+    //   final hiveService = serviceLocator<HiveCategoryService>();
+    //   final hasCategories = hiveService.getAllCategories().isNotEmpty;
 
-      final isOnWelcome = state.matchedLocation == Routes.welcome;
-      final isOnOnboarding = state.matchedLocation.startsWith('/onboarding');
-      final hasValidSettings = hasCurrency && hasCategories;
+    //   final isOnWelcome = state.matchedLocation == Routes.welcome;
+    //   final isOnOnboarding = state.matchedLocation.startsWith('/onboarding');
+    //   final hasValidSettings = hasCurrency && hasCategories;
 
-      // If has valid settings and on welcome/onboarding, redirect to home
-      if (hasValidSettings && (isOnWelcome || isOnOnboarding)) {
-        return Routes.home;
-      }
+    //   // If has valid settings and on welcome/onboarding, redirect to home
+    //   if (hasValidSettings && (isOnWelcome || isOnOnboarding)) {
+    //     return Routes.home;
+    //   }
 
-      // If no valid settings and trying to access main app, redirect to welcome
-      if (!hasValidSettings && !isOnWelcome && !isOnOnboarding) {
-        return Routes.welcome;
-      }
+    //   // If no valid settings and trying to access main app, redirect to welcome
+    //   if (!hasValidSettings && !isOnWelcome && !isOnOnboarding) {
+    //     return Routes.welcome;
+    //   }
 
-      return null; // No redirect
-    },
+    //   return null; // No redirect
+    // },
     routes: [
       GoRoute(path: Routes.welcome, builder: (context, state) => WelcomePage()),
       GoRoute(

@@ -36,6 +36,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_datetime_picker_plus: ^2.2.0
+  flutter_launcher_icons: ^0.14.4
   flutter_timezone: ^5.0.0
   fpdart: ^1.1.1
   get_it: ^8.2.0
@@ -43,6 +44,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   intl: ^0.20.2
+  names_launcher: ^0.0.2
   path: ^1.9.1
   path_provider: ^2.1.5
   shared_preferences: ^2.5.3
@@ -56,6 +58,23 @@ dev_dependencies:
     sdk: flutter
   hive_generator: ^2.0.1
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
+  adaptive_icon_background: "#FFFFFF"  # Your color here
+  min_sdk_android: 21 # android min sdk min:16, default 21
+
+
+names_launcher:
+  name: "Xpens Flow"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
@@ -68,6 +87,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -90,5 +110,16 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  fonts:
+    - family: OpenSans # This is the font family name you'll use
+      fonts:
+        - asset: fonts/OpenSans-Regular.ttf
+        - asset: fonts/OpenSans-Italic.ttf
+          style: italic
+        - asset: fonts/OpenSans-Bold.ttf
+          weight: 700 # Corresponds to FontWeight.bold
+        - asset: fonts/OpenSans-BoldItalic.ttf
+          weight: 700
+          style: italic
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
