@@ -6,6 +6,7 @@ class AppSpacing {
   static const double xl = 32.0;
   static const double xxl = 48.0;
 
+  static const double size60 = 60.0;
   static const double size80 = 80.0;
   static const double size100 = 100.0;
   static const double size150 = 150.0;

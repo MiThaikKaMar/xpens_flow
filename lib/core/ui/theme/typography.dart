@@ -7,26 +7,23 @@ class AppTypography {
   // --- Header Styles ---
   /// Largest headline style, suitable for prominent titles.
   static const TextStyle headlineLarge = TextStyle(
-    fontFamily: 'OpenSans',
+    fontFamily: 'Playfair',
     fontSize: 32.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark, // White for dark backgrounds
   );
 
   /// Medium headline style.
   static const TextStyle headlineMedium = TextStyle(
-    fontFamily: 'OpenSans',
+    fontFamily: 'Playfair',
     fontSize: 24.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark,
   );
 
   /// Small headline style.
   static const TextStyle headlineSmall = TextStyle(
-    fontFamily: 'OpenSans',
+    fontFamily: 'Playfair',
     fontSize: 20.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark,
   );
 
   // --- Body Text Styles ---
@@ -35,7 +32,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 16.0,
     fontWeight: FontWeight.normal,
-    color: AppColors.textPrimaryDark,
   );
 
   /// Smaller body text, often used for secondary information.
@@ -43,7 +39,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 14.0,
     fontWeight: FontWeight.normal,
-    color: AppColors.textSecondaryDark, // Lighter grey for less emphasis
   );
 
   /// Smallest body text, suitable for captions or footnotes.
@@ -51,7 +46,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 12.0,
     fontWeight: FontWeight.normal,
-    color: AppColors.textDisabledDark, // Even lighter grey
   );
 
   // --- Label Styles ---
@@ -60,7 +54,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 14.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark,
   );
 
   /// Style for medium labels.
@@ -68,7 +61,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 12.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textSecondaryDark,
   );
 
   // --- Special Styles for Amounts ---
@@ -77,7 +69,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 40.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark,
   );
 
   /// Medium bold style for amounts.
@@ -85,7 +76,6 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 28.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark,
   );
 
   /// Small bold style for amounts.
@@ -93,6 +83,5 @@ class AppTypography {
     fontFamily: 'OpenSans',
     fontSize: 20.0,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimaryDark,
   );
 }

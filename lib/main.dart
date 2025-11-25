@@ -6,8 +6,8 @@ import 'package:xpens_flow/core/common/app_strings.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
-import '../core/ui/bloc/app_settings_bloc.dart';
-import '../core/ui/theme/app_theme.dart';
+import 'core/ui/bloc/app_settings_bloc.dart';
+import 'core/ui/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -31,7 +31,8 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
-    initialLocation: Routes.welcome,
+    //initialLocation: Routes.welcome,
+    initialLocation: Routes.onboardingCarousel,
     // redirect: (BuildContext context, GoRouterState state) {
     //   // Check SharedPreferences directly
     //   final prefsHelper = serviceLocator<SharedPreferencesHelper>();

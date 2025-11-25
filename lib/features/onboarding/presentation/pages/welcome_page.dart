@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/router/routes.dart';
 import 'package:xpens_flow/core/common/app_strings.dart';
+import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
+import 'package:xpens_flow/core/ui/theme/typography.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -36,47 +38,113 @@ class WelcomePage extends StatelessWidget {
           ),
           child: Column(
             children: [
-              SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: AppSpacing.size80),
-                    // Main Icon
-                    Image.asset(
-                      "assets/icons/icon.png",
-                      width: AppSpacing.size150,
-                    ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: AppSpacing.size80),
+                      // Main Icon
+                      Image.asset(
+                        "assets/icons/icon.png",
+                        width: AppSpacing.size150,
+                      ),
 
-                    // Main Title
-                    Text(AppStrings.appName),
+                      SizedBox(height: AppSpacing.md),
+                      // Main Title
+                      Text(
+                        AppStrings.appName,
+                        style: AppTypography.headlineMedium.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
 
-                    // Description
-                    Text(AppStrings.welcomeDescription),
+                      SizedBox(height: AppSpacing.md),
+                      // Description
+                      Text(
+                        AppStrings.welcomeDescription,
+                        style: AppTypography.bodyLarge,
+                      ),
+                      SizedBox(height: AppSpacing.size100),
+                      // Encryped notice
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.scaffoldBackgroundDark.withOpacity(
+                            0.2,
+                          ),
+                          borderRadius: BorderRadius.circular(7),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.1),
+                          ),
+                        ),
+                        padding: EdgeInsets.all(AppSpacing.md),
 
-                    // Encryped notice
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.security),
-                        Text(AppStrings.encryptNotice),
-                      ],
-                    ),
-
-                    // Get Started Button
-                    ElevatedButton(
-                      onPressed: () {
-                        context.go(Routes.onboardingCarousel);
-                      },
-                      child: Text(AppStrings.getStarted),
-                    ),
-                  ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.security,
+                              color: AppColors.primary,
+                              size: AppSpacing.md,
+                            ),
+                            SizedBox(width: AppSpacing.sm),
+                            Text(
+                              AppStrings.encryptNotice,
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimaryDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.xl),
+                      // Get Started Button
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.go(Routes.onboardingCarousel);
+                          },
+                          child: Text(
+                            AppStrings.getStarted,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
               // Privacy & Terms
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text('Privacy'), Text('Terms')],
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+
+                  children: [
+                    Text(
+                      'Privacy',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(width: AppSpacing.xxl),
+                    Text(
+                      'Terms',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
