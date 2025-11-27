@@ -53,7 +53,7 @@ class _CarouselPageState extends State<CarouselPage> {
   }
 
   void navigateToFirstRunSetup() {
-    context.go(Routes.onboardingSetup);
+    context.push(Routes.onboardingSetup);
   }
 
   @override

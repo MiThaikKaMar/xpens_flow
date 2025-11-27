@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -8,6 +10,9 @@ import 'package:xpens_flow/core/common/app_strings.dart';
 import 'package:xpens_flow/core/common/init_variables.dart';
 import 'package:xpens_flow/core/data/datasources/haptic_feedback_helper.dart';
 import 'package:xpens_flow/core/data/datasources/shared_preferences_helper.dart';
+import 'package:xpens_flow/core/ui/theme/app_theme.dart';
+import 'package:xpens_flow/core/ui/theme/spacing.dart';
+import 'package:xpens_flow/core/ui/theme/typography.dart';
 import 'package:xpens_flow/features/onboarding/presentation/widgets/theme_list_item.dart';
 
 class FirstRunSetupPage extends StatefulWidget {
@@ -67,102 +72,197 @@ class _FirstRunSetupPageState extends State<FirstRunSetupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.setupAppBarTitle)),
-      body: Column(
-        children: [
-          Text(AppStrings.setupTitle),
-          Text(AppStrings.setupDes),
-
-          Text(AppStrings.suCurrency),
-
-          GestureDetector(
-            onTap: () {
-              showCurrencyPicker(
-                favorite: ["USD", "EUR", "HKD", "MMK"],
-                context: context,
-                onSelect: (e) {
-                  setState(() {
-                    _selectedCurrency = e;
-                  });
-                },
-              );
-            },
-            child: ListTile(
-              shape: Border.all(color: Colors.grey),
-              title: Text(
-                "${_selectedCurrency.code} - ${_selectedCurrency.name}",
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Main title
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                AppStrings.setupTitle,
+                style: AppTypography.headlineMedium,
+                textAlign: TextAlign.center,
               ),
-              trailing: Icon(Icons.search),
             ),
-          ),
-          Text(AppStrings.suTimezone),
+            SizedBox(height: AppSpacing.sm),
 
-          ListTile(
-            shape: Border.all(color: Colors.grey),
-            title: Text(
-              '${_currentTimeZone?.identifier ?? AppStrings.unknown} - ${_gmtOffsetFormatted ?? AppStrings.unknown}',
+            /// Description
+            SizedBox(
+              width: double.infinity,
+              child: Text(AppStrings.setupDes, textAlign: TextAlign.center),
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.auto_awesome_rounded),
-            title: Text(AppStrings.suAutoDetected),
-          ),
-          Text(AppStrings.suThemeTitle),
 
-          Row(
-            children: themes.map((item) {
-              return GestureDetector(
-                onTap: () => setState(() {
-                  _selectedTheme = item;
-                }),
-                child: ThemeListItem(
-                  itemBorderColor: _selectedTheme == item
-                      ? Colors.blue
-                      : Colors.grey,
-                  typeLable: item["label"],
-                  containerColor: item["color"],
+            SizedBox(height: AppSpacing.md),
+
+            /// Currency
+            Text(
+              AppStrings.suCurrency,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: AppSpacing.sm),
+
+            GestureDetector(
+              onTap: () {
+                showCurrencyPicker(
+                  favorite: ["USD", "EUR", "HKD", "MMK"],
+                  context: context,
+                  onSelect: (e) {
+                    setState(() {
+                      _selectedCurrency = e;
+                    });
+                  },
+                );
+              },
+              child: ListTile(
+                shape: AppTheme.roundedRectangleBorder,
+                title: Text(
+                  "${_selectedCurrency.code} - ${_selectedCurrency.name}",
                 ),
-              );
-            }).toList(),
-          ),
-          _canVibrate
-              ? ListTile(
-                  leading: Icon(Icons.mobile_friendly),
-                  title: Text(AppStrings.suEnableHapticFB),
-                  trailing: Switch(
-                    value: _isSwitchOn,
-                    onChanged: (value) {
-                      setState(() {
-                        _isSwitchOn = value;
-                      });
-                    },
+                trailing: Icon(Icons.search),
+              ),
+            ),
+
+            SizedBox(height: AppSpacing.md),
+
+            /// Time Zone
+            Text(
+              AppStrings.suTimezone,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: AppSpacing.sm),
+            ListTile(
+              shape: AppTheme.roundedRectangleBorder,
+              title: Text(
+                '${_currentTimeZone?.identifier ?? AppStrings.unknown} - ${_gmtOffsetFormatted ?? AppStrings.unknown}',
+              ),
+            ),
+            ListTile(
+              dense: true,
+              leading: Icon(
+                Icons.auto_awesome_rounded,
+                size: AppSpacing.md,
+                color: Colors.grey,
+              ),
+              minVerticalPadding: 0,
+
+              title: Text(
+                AppStrings.suAutoDetected,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            SizedBox(height: AppSpacing.md),
+
+            /// Theme
+            Text(
+              AppStrings.suThemeTitle,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: AppSpacing.sm),
+
+            Row(
+              children: themes.map((item) {
+                return GestureDetector(
+                  onTap: () => setState(() {
+                    _selectedTheme = item;
+                  }),
+                  child: ThemeListItem(
+                    itemBorderColor: _selectedTheme == item
+                        ? Colors.blue
+                        : Colors.grey,
+                    typeLabel: item["label"],
+                    containerColor: item["color"],
                   ),
-                )
-              : Text(AppStrings.suNoHapticFeedback),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: AppSpacing.md),
 
-          ListTile(
-            leading: Icon(Icons.security),
-            title: Text(AppStrings.suEncryptionEnabled),
-            subtitle: Text(AppStrings.suKeysStoredSecurely),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              addThePersonalizeToPrefs(
-                _selectedCurrency.symbol,
-                _selectedTheme?['label'],
-                _isSwitchOn,
-              );
-              if (_isSwitchOn == true) {
-                HapticFeedbackHelper.light();
-              }
+            // Haptic
+            _canVibrate
+                ? ListTile(
+                    shape: AppTheme.roundedRectangleBorder,
+                    leading: Icon(Icons.mobile_friendly, size: AppSpacing.md),
+                    title: Text(AppStrings.suEnableHapticFB),
+                    trailing: Switch(
+                      value: _isSwitchOn,
+                      onChanged: (value) {
+                        setState(() {
+                          _isSwitchOn = value;
+                        });
+                      },
+                    ),
+                  )
+                : ListTile(
+                    tileColor: Colors.blueGrey.withOpacity(0.1),
+                    leading: Icon(
+                      Icons.mobile_friendly,
+                      color: Colors.grey,
+                      size: AppSpacing.md,
+                    ),
+                    title: Text(
+                      AppStrings.suNoHapticFeedback,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    shape: AppTheme.roundedRectangleBorder.copyWith(
+                      side: BorderSide(color: Colors.transparent),
+                    ),
+                  ),
 
-              debugPrint(
-                "${widget.prefsHelper.getString(AppStrings.sfCurrentCurrency)} + ${widget.prefsHelper.getString(AppStrings.sfSelectedTheme)} + ${widget.prefsHelper.getBool(AppStrings.sfIsHapticOn)}",
-              );
-              context.push(Routes.onboardingCatSuggest);
-            },
-            child: Text(AppStrings.bContinue),
-          ),
-        ],
+            SizedBox(height: AppSpacing.sm),
+
+            /// Encryption Enabled
+            ListTile(
+              tileColor: Colors.lightGreen.withOpacity(0.1),
+              shape: AppTheme.roundedRectangleBorder.copyWith(
+                side: BorderSide(color: Colors.transparent),
+              ),
+              leading: Icon(
+                Icons.security,
+                color: const Color.fromARGB(255, 10, 118, 66),
+              ),
+              title: Text(AppStrings.suEncryptionEnabled),
+              subtitle: Text(
+                AppStrings.suKeysStoredSecurely,
+                style: AppTypography.bodySmall.copyWith(
+                  color: Color.fromARGB(255, 10, 118, 66),
+                ),
+              ),
+            ),
+
+            ////......................
+            Container(
+              margin: EdgeInsets.only(top: AppSpacing.lg),
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  addThePersonalizeToPrefs(
+                    _selectedCurrency.symbol,
+                    _selectedTheme?['label'],
+                    _isSwitchOn,
+                  );
+                  if (_isSwitchOn == true) {
+                    HapticFeedbackHelper.light();
+                  }
+
+                  debugPrint(
+                    "${widget.prefsHelper.getString(AppStrings.sfCurrentCurrency)} + ${widget.prefsHelper.getString(AppStrings.sfSelectedTheme)} + ${widget.prefsHelper.getBool(AppStrings.sfIsHapticOn)}",
+                  );
+                  context.push(Routes.onboardingCatSuggest);
+                },
+                child: Text(
+                  AppStrings.bContinue,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

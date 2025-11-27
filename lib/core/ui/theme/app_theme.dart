@@ -1,11 +1,18 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'colors.dart';
 import 'typography.dart';
 
 /// Manages the application's theme data, providing both dark and light themes.
 class AppTheme {
+  // Shade Styles
+  static RoundedRectangleBorder roundedRectangleBorder = RoundedRectangleBorder(
+    side: BorderSide(color: Colors.grey),
+    borderRadius: BorderRadius.circular(AppSpacing.sm),
+  );
+
   // === DARK THEME ===
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
@@ -55,7 +62,8 @@ class AppTheme {
 
     // AppBar
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.surfaceDark,
+      // backgroundColor: AppColors.surfaceDark,
+      backgroundColor: AppColors.backgroundDark,
       foregroundColor: AppColors.textPrimaryDark,
       elevation: 0,
       centerTitle: true,

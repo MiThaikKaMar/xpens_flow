@@ -41,6 +41,12 @@ class AppTypography {
     fontWeight: FontWeight.normal,
   );
 
+  static const TextStyle bodySemiSmall = TextStyle(
+    fontFamily: 'OpenSans',
+    fontSize: 13.0,
+    fontWeight: FontWeight.normal,
+  );
+
   /// Smallest body text, suitable for captions or footnotes.
   static const TextStyle bodySmall = TextStyle(
     fontFamily: 'OpenSans',
