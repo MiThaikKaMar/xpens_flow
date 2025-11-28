@@ -1,5 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:xpens_flow/core/ui/theme/colors.dart';
+import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'package:xpens_flow/features/transactions/presentation/sheets/quick_add_sheet.dart';
 
 class MainPage extends StatefulWidget {
@@ -26,6 +30,10 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(),
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBar(
+        indicatorColor: AppColors.primary.withOpacity(0.5),
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.md),
+        ),
         selectedIndex: widget.navigationShell.currentIndex,
         onDestinationSelected: (index) {
           widget.navigationShell.goBranch(
@@ -62,7 +70,7 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xff03dac6),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.black,
         mini: true,
         onPressed: () {

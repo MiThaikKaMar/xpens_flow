@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/router/routes.dart';
 import 'package:xpens_flow/core/common/app_strings.dart';
 import 'package:xpens_flow/core/data/models/category_model.dart';
+import 'package:xpens_flow/core/ui/theme/spacing.dart';
+import 'package:xpens_flow/core/ui/theme/typography.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
 import 'package:xpens_flow/features/onboarding/presentation/widgets/category_card.dart';
 
@@ -36,84 +38,127 @@ class _CategoriesSuggestPageState extends State<CategoriesSuggestPage> {
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.catAppBarTitle)),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: AppSpacing.lg,
+            right: AppSpacing.lg,
+            bottom: AppSpacing.lg,
+          ),
+          child: Column(
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: AppSpacing.sm),
+                  // Title
                   Text(
                     AppStrings.catTitle,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: AppTypography.headlineMedium,
                   ),
                   const SizedBox(height: 8),
-                  Text(AppStrings.catDes),
+
+                  // Description
+                  Text(AppStrings.catDes, style: TextStyle(color: Colors.grey)),
                 ],
               ),
-            ),
-            Expanded(
-              child: BlocBuilder<CategoryCubit, CategoryState>(
+              SizedBox(height: AppSpacing.md),
+              // Categories
+              Expanded(
+                child: BlocBuilder<CategoryCubit, CategoryState>(
+                  builder: (context, state) {
+                    if (state is CategoryLoaded) {
+                      final List<CategoryModel> addNewIncludedList = [
+                        ...state.initCatList,
+                        CategoryModel(iconName: "Icons.add", label: "Add New"),
+                      ];
+
+                      return GridView.count(
+                        crossAxisCount: 2,
+                        //padding: const EdgeInsets.all(16.0),
+                        mainAxisSpacing: AppSpacing.xs,
+                        crossAxisSpacing: AppSpacing.xs,
+                        childAspectRatio: 1.4,
+                        children: addNewIncludedList.map((cat) {
+                          bool isSelected = false;
+                          if (state.selectedCatList != null) {
+                            isSelected = state.selectedCatList!.contains(cat);
+                          }
+                          return GestureDetector(
+                            onTap: () {
+                              _handleTapCard(cat, isSelected);
+                            },
+                            child: CategoryCard(
+                              cardItem: cat,
+                              isSelected: isSelected,
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    }
+
+                    return Container();
+                  },
+                ),
+              ),
+
+              SizedBox(height: AppSpacing.md),
+              // Confirm Button
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: ElevatedButton(
+              //     onPressed: () {
+              //       context.read<CategoryCubit>().onCompleteOnboarding();
+              //       context.go(Routes.home);
+              //     },
+              //     child: Text(
+              //       AppStrings.catBtComfirmCate,
+              //       style: AppTypography.bodyLarge.copyWith(
+              //         fontWeight: FontWeight.w600,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              BlocBuilder<CategoryCubit, CategoryState>(
                 builder: (context, state) {
-                  if (state is CategoryLoaded) {
-                    final List<CategoryModel> addNewIncludedList = [
-                      ...state.initCatList,
-                      CategoryModel(iconName: "Icons.add", label: "Add New"),
-                    ];
+                  final bool hasSelection =
+                      state is CategoryLoaded &&
+                      state.selectedCatList != null &&
+                      state.selectedCatList!.isNotEmpty;
 
-                    return GridView.count(
-                      crossAxisCount: 2,
-                      padding: const EdgeInsets.all(16.0),
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      children: addNewIncludedList.map((cat) {
-                        bool isSelected = false;
-                        if (state.selectedCatList != null) {
-                          isSelected = state.selectedCatList!.contains(cat);
-                        }
-                        return GestureDetector(
-                          onTap: () {
-                            _handleTapCard(cat, isSelected);
-                          },
-                          child: CategoryCard(
-                            cardItem: cat,
-                            isSelected: isSelected,
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  }
-
-                  return Container();
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: hasSelection
+                          ? () {
+                              context
+                                  .read<CategoryCubit>()
+                                  .onCompleteOnboarding();
+                              context.go(Routes.home);
+                            }
+                          : null,
+                      child: Text(
+                        AppStrings.catBtComfirmCate,
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  context.read<CategoryCubit>().onCompleteOnboarding();
-                  context.go(Routes.home);
-                },
-                child: Text(AppStrings.catBtComfirmCate),
-              ),
-            ),
-
-            TextButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Skipping category selection.")),
-                );
-                context.push(Routes.home);
-              },
-              child: Text(AppStrings.catDoItLater),
-            ),
-            SizedBox(height: 16),
-          ],
+              // TextButton(
+              //   onPressed: () {
+              //     ScaffoldMessenger.of(context).showSnackBar(
+              //       const SnackBar(content: Text("Skipping category selection.")),
+              //     );
+              //     context.push(Routes.home);
+              //   },
+              //   child: Text(AppStrings.catDoItLater),
+              // ),
+              // SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
