@@ -1,5 +1,5 @@
 import 'package:currency_picker/currency_picker.dart';
-import 'package:xpens_flow/core/common/app_strings.dart';
+import 'package:xpens_flow/core/common/utils/app_strings.dart';
 import 'package:xpens_flow/core/data/models/category_model.dart';
 
 class InitVariables {

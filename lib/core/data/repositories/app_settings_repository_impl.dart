@@ -4,7 +4,7 @@ import 'package:xpens_flow/core/data/datasources/shared_preferences_helper.dart'
 import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/error/failures.dart';
 
-import '../../common/app_strings.dart';
+import '../../common/utils/app_strings.dart';
 import '../../domain/repositories/app_settings_repository.dart';
 
 class AppSettingsRepositoryImpl implements AppSettingsRepository {

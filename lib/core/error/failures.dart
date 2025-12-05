@@ -12,3 +12,7 @@ abstract class Failure extends Equatable {
 class DatabaseFailure extends Failure {
   const DatabaseFailure({required super.message});
 }
+
+class PreferenceError extends Failure {
+  const PreferenceError({required super.message});
+}

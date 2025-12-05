@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:xpens_flow/core/domain/usecases/get_current_currency.dart';
 import 'package:xpens_flow/core/domain/usecases/usecase.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/add_transaction.dart';
@@ -13,11 +14,16 @@ class TransactionFeedBloc
     extends Bloc<TransactionFeedEvent, TransactionFeedState> {
   final AddTransaction _addTransaction;
   final ListTransactions _listTransactions;
+  final GetCurrentCurrency _getCurrentCurrency;
 
-  TransactionFeedBloc({required addTransaction, required listTransactions})
-    : _addTransaction = addTransaction,
-      _listTransactions = listTransactions,
-      super(TransactionFeedInitial()) {
+  TransactionFeedBloc({
+    required addTransaction,
+    required listTransactions,
+    required getCurrentCurrency,
+  }) : _addTransaction = addTransaction,
+       _listTransactions = listTransactions,
+       _getCurrentCurrency = getCurrentCurrency,
+       super(TransactionFeedInitial()) {
     // on<TransactionFeedEvent>((_, emit) {
     //   emit(TransactionFeedLoading());
     // });
@@ -33,6 +39,14 @@ class TransactionFeedBloc
 
     final result = await _listTransactions.call(NoParams());
 
+    String currency = '';
+    final currencyResult = _getCurrentCurrency.appSettingsRepository
+        .getCurrentcurrency();
+    currencyResult.fold(
+      (error) => debugPrint(error.message),
+      (successCurrency) => currency = successCurrency,
+    );
+
     result.fold(
       (e) {
         debugPrint("Error Fetching transacton: ${e.message}");
@@ -40,7 +54,12 @@ class TransactionFeedBloc
       },
       (list) {
         debugPrint("All transation fetched: $list");
-        emit(TransactionFeedLoaded(transactionList: list));
+        emit(
+          TransactionFeedLoaded(
+            currencySymbol: currency,
+            transactionList: list,
+          ),
+        );
       },
     );
   }

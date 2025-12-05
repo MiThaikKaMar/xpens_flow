@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:xpens_flow/core/ui/format/date_format.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
+import 'package:xpens_flow/features/transactions/presentation/widgets/transaction_list_item.dart';
 
 class TransactionsFeedPage extends StatefulWidget {
   final TransactionFeedBloc transactionFeedBloc;
@@ -41,26 +41,15 @@ class _TransactionsFeedPageState extends State<TransactionsFeedPage> {
               );
             }
 
+            final currencySymbol = state.currencySymbol;
+
             return ListView.builder(
               itemCount: state.transactionList.length,
               itemBuilder: (context, index) {
                 final transaction = state.transactionList[index];
-                return Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(transaction.merchant_note ?? ''),
-                        Text(transaction.amount.toString()),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(transaction.category),
-                        Text(formatDateTime(transaction.date_time)),
-                      ],
-                    ),
-                  ],
+                return TransactionListItem(
+                  transaction: transaction,
+                  currencySymbol: currencySymbol,
                 );
               },
             );

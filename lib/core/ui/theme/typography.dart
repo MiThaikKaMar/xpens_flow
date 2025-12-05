@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'colors.dart'; // Assuming colors.dart is in the same directory
 
 /// Defines the typographic styles for the application.
 /// These styles are designed for a dark theme context.

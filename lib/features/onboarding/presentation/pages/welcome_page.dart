@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/router/routes.dart';
-import 'package:xpens_flow/core/common/app_strings.dart';
+import 'package:xpens_flow/core/common/utils/app_strings.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'package:xpens_flow/core/ui/theme/typography.dart';

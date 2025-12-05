@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/di/init_dependencies.dart';
-import 'package:xpens_flow/core/common/app_strings.dart';
+import 'package:xpens_flow/core/common/utils/app_strings.dart';
 import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
