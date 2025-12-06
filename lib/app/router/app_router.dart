@@ -16,7 +16,7 @@ import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.d
 import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
 
-import '../../core/common/app_strings.dart';
+import '../../core/common/utils/app_strings.dart';
 import '../../features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
 final GlobalKey<NavigatorState> _dashboardNavigatorKey =
@@ -32,6 +32,7 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 class AppRouter {
   final GoRouter router = GoRouter(
     initialLocation: Routes.welcome,
+   // initialLocation: Routes.transactions,
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();

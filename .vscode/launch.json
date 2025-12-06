@@ -8,7 +8,7 @@
             "name": "xpens_flow",
             "request": "launch",
             "type": "dart",
-            "program": "lib/app/main.dart"
+            "program": "lib/main.dart"
         },
         {
             "name": "xpens_flow (profile mode)",

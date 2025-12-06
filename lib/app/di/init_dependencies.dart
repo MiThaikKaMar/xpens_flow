@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xpens_flow/app/router/app_router.dart';
-import 'package:xpens_flow/core/common/init_variables.dart';
+import 'package:xpens_flow/core/common/utils/init_variables.dart';
 import 'package:xpens_flow/core/data/datasources/database_helper.dart';
 import 'package:xpens_flow/core/data/datasources/hive_category_service.dart';
 import 'package:xpens_flow/core/data/datasources/shared_preferences_helper.dart';
@@ -97,6 +97,7 @@ void _transaction() {
     () => TransactionFeedBloc(
       addTransaction: serviceLocator<AddTransaction>(),
       listTransactions: serviceLocator<ListTransactions>(),
+      getCurrentCurrency: serviceLocator<GetCurrentCurrency>(),
     ),
   );
 }

@@ -15,8 +15,12 @@ final class TransactionFeedAddSuccess extends TransactionFeedState {}
 
 final class TransactionFeedLoaded extends TransactionFeedState {
   final List<Transaction> transactionList;
+  final String currencySymbol;
 
-  const TransactionFeedLoaded({required this.transactionList});
+  const TransactionFeedLoaded({
+    required this.currencySymbol,
+    required this.transactionList,
+  });
 }
 
 final class TransactionFeedError extends TransactionFeedState {
