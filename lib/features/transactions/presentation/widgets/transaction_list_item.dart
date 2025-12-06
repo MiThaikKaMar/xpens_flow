@@ -28,13 +28,15 @@ class _TransactionListItemState extends State<TransactionListItem> {
   void initState() {
     super.initState();
     _isExpense = widget.transaction.type == TransactionType.expense;
-    _amountText = _isExpense
-        ? "-${widget.currencySymbol}${widget.transaction.amount}"
-        : "+${widget.currencySymbol}${widget.transaction.amount}";
+    
   }
 
   @override
   Widget build(BuildContext context) {
+_amountText = _isExpense
+        ? "-${widget.currencySymbol}${widget.transaction.amount}"
+        : "+${widget.currencySymbol}${widget.transaction.amount}";
+
     return Container(
       padding: EdgeInsets.all(AppSpacing.lg),
       color: Colors.blue,
