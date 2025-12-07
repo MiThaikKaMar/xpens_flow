@@ -16,6 +16,7 @@ class Routes {
 
   //Transactions
   static String transactions = "/transactions";
+  static String transactionDetail = "/transactions/:id";
 
   // Budgets
   static String budgets = "/budgets";

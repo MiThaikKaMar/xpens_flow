@@ -132,7 +132,7 @@ class AppColors {
   static Color darkOrange = Color.fromARGB(255, 248, 212, 168);
 
   static Map<String, Color> categoryColorMap = {
-    'Housing': Color(0xFF778899), // Slate Gray
+    'Housing': Color.fromARGB(255, 171, 198, 226), // Slate Gray
     'Utilities': Color(
       0xFF4682B4,
     ), // Steel Blue (This one was causing issues before, but is now correct)
