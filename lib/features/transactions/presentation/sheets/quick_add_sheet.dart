@@ -12,6 +12,7 @@ import 'package:xpens_flow/features/transactions/data/models/transaction_model.d
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
+import '../../../../core/common/utils/show_snackbar.dart';
 import '../../../../core/ui/bloc/app_settings_bloc.dart';
 import '../../../../core/ui/theme/colors.dart';
 import '../../../../core/ui/theme/spacing.dart';
@@ -37,12 +38,25 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
   String currencySign = '';
   List<CategoryModel>? _categories = [];
 
+  bool _isAmountInvalid = false;
+
   late TransactionFeedBloc _transactionFeedBloc;
 
   @override
   void initState() {
     super.initState();
     _transactionFeedBloc = BlocProvider.of<TransactionFeedBloc>(context);
+
+    amountEditingController.addListener(() {
+      final text = amountEditingController.text.trim();
+      final isEmpty = text.isEmpty;
+
+      if (!isEmpty) {
+        setState(() {
+          _isAmountInvalid = false;
+        });
+      }
+    });
   }
 
   @override
@@ -60,6 +74,9 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
     final amountText = amountEditingController.text.trim();
 
     if (amountText.isEmpty) {
+      setState(() {
+        _isAmountInvalid = true;
+      });
       //showSnackbar(context, "Amount can not be empty");
       debugPrint("Amount can not be empty");
       return;
@@ -236,6 +253,18 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
               ),
               SizedBox(height: AppSpacing.sm),
               Text("Tap to edit amount", style: TextStyle(color: Colors.grey)),
+              Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: _isAmountInvalid,
+                child: Text(
+                  "Amount is required!",
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.errorLight,
+                  ),
+                ),
+              ),
               SizedBox(height: AppSpacing.sm),
 
               //........
@@ -313,9 +342,19 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
                     SizedBox(height: AppSpacing.md),
 
                     // Merchant/ Note
-                    Text(
-                      "Merchant/ Note",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        Text(
+                          "Merchant/ Note",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: AppSpacing.xs),
+                        Icon(
+                          Icons.info_outline,
+                          size: AppSpacing.size18,
+                          color: Colors.grey,
+                        ),
+                      ],
                     ),
                     SizedBox(height: AppSpacing.sm),
                     TextField(

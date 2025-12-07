@@ -14,6 +14,7 @@ import 'package:xpens_flow/features/onboarding/presentation/pages/categories_sug
 import 'package:xpens_flow/features/onboarding/presentation/pages/first_run_setup_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transaction_detail_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
 
 import '../../core/common/utils/app_strings.dart';
@@ -27,12 +28,13 @@ final GlobalKey<NavigatorState> _transactionsNavigatorKey =
     GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _budgetsNavigatorKey =
     GlobalKey<NavigatorState>();
+
 final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
     initialLocation: Routes.welcome,
-   // initialLocation: Routes.transactions,
+    //initialLocation: Routes.transactionDetail,
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();
@@ -79,6 +81,14 @@ class AppRouter {
           categoryCubit: serviceLocator<CategoryCubit>(),
         ),
       ),
+      GoRoute(
+        path: Routes
+            .transactionDetail, // relative to /transactions => /transactions/:id
+        builder: (BuildContext context, GoRouterState state) {
+          final id = state.pathParameters['id']!;
+          return TransactionDetailPage(transactionId: int.parse(id));
+        },
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainPage(navigationShell: navigationShell);
@@ -114,9 +124,23 @@ class AppRouter {
                 builder: (context, state) => TransactionsFeedPage(
                   transactionFeedBloc: serviceLocator<TransactionFeedBloc>(),
                 ),
+                // routes: [
+                //   GoRoute(
+                //     //name: Routes.transactionDetail,
+                //     path:
+                //         ":id", // relative to /transactions => /transactions/:id
+                //     builder: (BuildContext context, GoRouterState state) {
+                //       final id = state.pathParameters['id']!;
+                //       return TransactionDetailPage(
+                //         transactionId: int.parse(id),
+                //       );
+                //     },
+                //   ),
+                // ],
               ),
             ],
           ),
+
           StatefulShellBranch(
             navigatorKey: _budgetsNavigatorKey,
             routes: [

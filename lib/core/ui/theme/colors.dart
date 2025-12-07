@@ -113,4 +113,47 @@ class AppColors {
 
   /// Highlight shimmer color for light theme
   static const Color shimmerHighlightLight = Color(0xFFF5F5F5);
+
+  /// Category Chip color
+  // Housing
+  // Utilities
+  // Groceries
+  // Transport
+  // Insurance
+  // Health
+  // Dining
+  // Entertainment
+  // Shopping
+  // Travel
+  // Subscriptions
+  // Savings
+  // Income
+  // Other
+  static Color darkOrange = Color.fromARGB(255, 248, 212, 168);
+
+  static Map<String, Color> categoryColorMap = {
+    'Housing': Color.fromARGB(255, 171, 198, 226), // Slate Gray
+    'Utilities': Color(
+      0xFF4682B4,
+    ), // Steel Blue (This one was causing issues before, but is now correct)
+    'Groceries': Color.fromARGB(255, 170, 246, 203), // Sea Green
+    'Transport': Color.fromRGBO(146, 195, 244, 1), // Dodger Blue
+    'Insurance': Color.fromARGB(255, 147, 147, 243), // Navy
+    'Health': Color.fromARGB(255, 161, 245, 161), // Lime Green
+    'Dining': darkOrange, // Dark Orange
+    'Entertainment': Color.fromARGB(255, 211, 172, 247), // Blue Violet
+    'Shopping': Color.fromARGB(255, 251, 192, 249), // Orchid
+    'Travel': Color.fromARGB(255, 249, 168, 209), // Hot Pink
+    'Subscriptions': Color.fromARGB(255, 190, 181, 248), // Slate Blue
+    'Savings': Color.fromARGB(255, 207, 251, 207), // Light Green
+    'Income': Color.fromARGB(255, 196, 250, 196), // Medium Sea Green
+    'Other': Color.fromARGB(255, 242, 191, 191), // Dark Grey
+  };
+
+  static Color getCategoryColor(String categoryName) {
+    return categoryColorMap[categoryName] ?? Color(0xFFA9A9A9); // fallback
+  }
+
+  static Color darkBlueBackground = Color.fromRGBO(12, 21, 28, 1);
+  static Color darkBlueBgLight = Color.fromRGBO(19, 34, 45, 1);
 }

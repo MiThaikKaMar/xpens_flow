@@ -1,4 +1,5 @@
 class AppSpacing {
+  static const double xxxs = 1.0;
   static const double xxs = 2.0;
   static const double xs = 4.0;
   static const double sm = 8.0;
