@@ -35,7 +35,8 @@ String formatDateForListItem(DateTime dateTime) {
     return 'Yesterday';
   } else if (now.difference(dateTime).inDays < 7) {
     // Within the last week, show day name
-    return DateFormat('EEEE').format(dateTime);
+    //return DateFormat('EEEE').format(dateTime);
+    return DateFormat('MMM d').format(dateTime);
   } else {
     // Older dates, show full date
     return DateFormat('MMM d').format(dateTime);
