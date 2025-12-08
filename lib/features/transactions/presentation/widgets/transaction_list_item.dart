@@ -55,6 +55,10 @@ class _TransactionListItemState extends State<TransactionListItem> {
             ':id',
             widget.transaction.id.toString(),
           ),
+          extra: {
+            'transaction': widget.transaction,
+            'symbol': widget.currencySymbol,
+          },
         );
       },
       child: Container(

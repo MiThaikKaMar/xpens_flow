@@ -14,6 +14,7 @@ import 'package:xpens_flow/features/onboarding/presentation/pages/categories_sug
 import 'package:xpens_flow/features/onboarding/presentation/pages/first_run_setup_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
+import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_detail_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_editor_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
@@ -87,7 +88,14 @@ class AppRouter {
             .transactionDetail, // relative to /transactions => /transactions/:id
         builder: (BuildContext context, GoRouterState state) {
           final id = state.pathParameters['id']!;
-          return TransactionDetailPage(transactionId: int.parse(id));
+          final extras = state.extra as Map<String, dynamic>;
+          final transaction = extras['transaction'] as Transaction;
+          final currencySymbol = extras['symbol'] as String;
+          return TransactionDetailPage(
+            transactionId: int.parse(id),
+            transaction: transaction,
+            currencySymbol: currencySymbol,
+          );
         },
       ),
       GoRoute(
