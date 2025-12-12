@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, non_constant_identifier_names
 
+import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
+
 class Transaction {
   final int? id;
   final double amount;
@@ -38,14 +40,25 @@ class Transaction {
     this.updatedAt,
     this.appliedRule,
   });
-}
 
-class TransactionSplit {
-  final String category;
-  final double amount;
-  final String? note;
+  //Helper method to get display merchant
+  String get displayMerchant => merchant_note ?? "Unknown";
 
-  TransactionSplit({required this.category, required this.amount, this.note});
+  //Helper method to check if transaction has splits
+  bool get hasSplits => splits != null && splits!.isNotEmpty;
+
+  //Helper method to calculate total from splits
+  double get calculatedTotal {
+    if (!hasSplits) return amount;
+    return splits!.fold(0.0, (sum, split) => sum + split.amount);
+  }
+
+  // Helper to validate splits sum equals transaction amount
+  bool get splitsAreValid {
+    if (!hasSplits) return true;
+    return (calculatedTotal - amount).abs() <
+        0.01; // Account for floating point
+  }
 }
 
 // class Transaction {
