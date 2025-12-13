@@ -28,16 +28,22 @@ class DatabaseHelper {
       version: _databaseVersion,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
+      onConfigure: _onConfigure,
     );
+  }
+
+  // Enable foreign keys
+  Future<void> _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
   }
 
   Future<void> _onCreate(Database db, int version) async {
     debugPrint('Creating database tables...');
 
-    //transactions table
+    //Create transactions table
     await db.execute(TransactionTable.createTableSQL);
 
-    // Transaction splits table
+    // Create Transaction splits table
     await db.execute(TransactionSplitTable.createTableSQL);
 
     debugPrint('Database tables created.');

@@ -31,6 +31,17 @@ class TransactionSplitModel extends TransactionSplit {
     );
   }
 
+  // Convert from TransactionSplit entity to TransactionSplitModel
+  factory TransactionSplitModel.fromEntity(TransactionSplit split) {
+    return TransactionSplitModel(
+      id: split.id,
+      transactionId: split.transactionId,
+      category: split.category,
+      amount: split.amount,
+      note: split.note,
+    );
+  }
+
   // Copy with method
   TransactionSplitModel copyWith({
     int? id,

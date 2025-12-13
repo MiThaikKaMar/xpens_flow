@@ -410,3 +410,74 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
     //  );
   }
 }
+
+
+/// Quick Add Enhancement
+/// // Update your Quick Add to optionally capture more data
+// class QuickAddTransaction extends StatefulWidget {
+//   // ... existing code
+// }
+
+// class _QuickAddTransactionState extends State<QuickAddTransaction> {
+//   // Existing fields
+//   double? amount;
+//   String? category;
+//   TransactionType? type;
+  
+//   // NEW: Optional fields (can be added later in Edit)
+//   String? selectedAccount;
+//   String? merchant;
+//   bool showAdvancedFields = false; // Toggle for advanced input
+  
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         // Existing quick add fields...
+        
+//         // Optional: "More Details" button
+//         TextButton(
+//           onPressed: () {
+//             setState(() => showAdvancedFields = !showAdvancedFields);
+//           },
+//           child: Text(showAdvancedFields ? "Less Details" : "More Details"),
+//         ),
+        
+//         if (showAdvancedFields) ...[
+//           // Account dropdown
+//           DropdownButton<String>(
+//             value: selectedAccount,
+//             hint: Text("Select Account"),
+//             items: accounts.map((acc) => 
+//               DropdownMenuItem(value: acc, child: Text(acc))
+//             ).toList(),
+//             onChanged: (val) => setState(() => selectedAccount = val),
+//           ),
+          
+//           // Merchant field
+//           TextField(
+//             decoration: InputDecoration(labelText: "Merchant"),
+//             onChanged: (val) => merchant = val,
+//           ),
+//         ],
+        
+//         // Save button creates transaction with available data
+//         ElevatedButton(
+//           onPressed: () {
+//             final transaction = Transaction(
+//               amount: amount!,
+//               category: category!,
+//               type: type!,
+//               date_time: DateTime.now(),
+//               merchant_note: merchant,
+//               account: selectedAccount,
+//               // Other fields will be null and can be edited later
+//             );
+//             // Save transaction
+//           },
+//           child: Text("Save"),
+//         ),
+//       ],
+//     );
+//   }
+// }
