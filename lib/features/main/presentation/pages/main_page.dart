@@ -108,6 +108,8 @@ class _MainPageState extends State<MainPage> {
           showModalBottomSheet<void>(
             context: context,
             isScrollControlled: true,
+            isDismissible: false,
+            enableDrag: false,
             builder: (BuildContext context) {
               return SizedBox(
                 height: double.infinity,

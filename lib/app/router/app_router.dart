@@ -103,7 +103,14 @@ class AppRouter {
         builder: (context, state) {
           final idString = state.pathParameters['id']!;
           final transactionId = int.parse(idString);
-          return TransactionEditorPage(transactionId: transactionId);
+          final extras = state.extra as Map<String, dynamic>;
+          final transaction = extras['transaction'] as Transaction;
+          final currencySymbol = extras['symbol'] as String;
+          return TransactionEditorPage(
+            transactionId: transactionId,
+            transaction: transaction,
+            currencySymbol: currencySymbol,
+          );
         },
       ),
       StatefulShellRoute.indexedStack(

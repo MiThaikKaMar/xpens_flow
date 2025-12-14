@@ -9,6 +9,7 @@ import 'package:xpens_flow/core/ui/format/date_format.dart';
 import '../../../../core/ui/theme/colors.dart';
 import '../../../../core/ui/theme/spacing.dart';
 import '../../domain/entities/transaction.dart';
+import '../../domain/entities/transaction_split.dart';
 
 class TransactionDetailPage extends StatefulWidget {
   const TransactionDetailPage({
@@ -38,12 +39,26 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    _amountText = _isExpense
-        ? "-${widget.currencySymbol}${widget.transaction.amount}"
-        : "+${widget.currencySymbol}${widget.transaction.amount}";
+    Transaction transaction = widget.transaction;
 
-    String categoryText = widget.transaction.category;
-    String merchantNote = widget.transaction.merchant_note ?? '';
+    _amountText = _isExpense
+        ? "-${widget.currencySymbol}${transaction.amount}"
+        : "+${widget.currencySymbol}${transaction.amount}";
+
+    String categoryText = transaction.category;
+    String merchantNote = transaction.merchant_note ?? '';
+    TransactionType type = transaction.type;
+    DateTime dateTime = transaction.date_time;
+    String? account = transaction.account;
+    String? description = transaction.description;
+    List<String>? tags = transaction.tags;
+    bool isTransfer = transaction.isTransfer;
+    bool isRecurring = transaction.isRecurring;
+    List<String>? attachments = transaction.attachments;
+    List<TransactionSplit>? splits = transaction.splits;
+    DateTime? createdAt = transaction.createdAt;
+    DateTime? updatedAt = transaction.updatedAt;
+    String? appliedRule = transaction.appliedRule;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,6 +78,10 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                     ':id',
                     widget.transactionId.toString(),
                   ),
+                  extra: {
+                    'transaction': transaction,
+                    'symbol': widget.currencySymbol,
+                  },
                 );
               },
               icon: Icon(
@@ -104,7 +123,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
 
             // Top part
             Text(_amountText),
-            Visibility(visible: false, child: Text('Chase Checking')),
+            Visibility(visible: account != null, child: Text('Chase Checking')),
 
             /// Account
             ///Chase: This is the name of a well-known major bank (JPMorgan Chase).
@@ -129,7 +148,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
 
             /// Description
             Visibility(
-              visible: false,
+              visible: description != null,
               child: Column(
                 children: [
                   Text("DESCRIPTION"),
@@ -143,7 +162,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             //....................................
             /// Tags
             Visibility(
-              visible: false,
+              visible: tags != null,
               child: Column(
                 children: [
                   Text("TAGS"),
@@ -157,7 +176,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
 
             //Attachments
             Visibility(
-              visible: false,
+              visible: attachments != null,
               child: Column(
                 children: [
                   Text("ATTACHMENTS"),
@@ -174,7 +193,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             //......................
             // Split Details
             Visibility(
-              visible: false,
+              visible: splits != null && splits.isNotEmpty,
               child: Column(
                 children: [
                   Text("SPLIT DETAILS"),
@@ -194,19 +213,25 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ),
             //.............................
             // Rules
-            Row(
-              children: [
-                Checkbox(value: false, onChanged: (bool? value) {}),
-                Text("Mark as Transfer"),
-              ],
+            Visibility(
+              visible: isTransfer,
+              child: Row(
+                children: [
+                  Checkbox(value: true, onChanged: (bool? value) {}),
+                  Text("Mark as Transfer"),
+                ],
+              ),
             ),
-            Row(
-              children: [
-                Checkbox(value: false, onChanged: (bool? value) {}),
-                Text("Recurring Transaction"),
-              ],
+            Visibility(
+              visible: isRecurring,
+              child: Row(
+                children: [
+                  Checkbox(value: true, onChanged: (bool? value) {}),
+                  Text("Recurring Transaction"),
+                  Divider(),
+                ],
+              ),
             ),
-            Divider(),
 
             //................................
             //Audit
@@ -215,16 +240,19 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               "Created: ${formatFullDateTime(widget.transaction.date_time)}",
             ),
             Visibility(
-              visible: false,
-              child: Text("Updated: Jan 15, 2024 at 9:35 AM"),
+              visible: updatedAt != null,
+              child: Text("Updated: ${formatFullDateTime(updatedAt!)}"),
             ),
             SizedBox(height: AppSpacing.md),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: "Rule applied:"),
-                  TextSpan(text: "Monthly Rent Auto-categorize"),
-                ],
+            Visibility(
+              visible: appliedRule != null,
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: "Rule applied:"),
+                    TextSpan(text: "Monthly Rent Auto-categorize"),
+                  ],
+                ),
               ),
             ),
           ],
