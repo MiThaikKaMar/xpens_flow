@@ -6,6 +6,7 @@ import 'package:xpens_flow/core/common/utils/icon_helper.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
+import 'package:xpens_flow/features/transactions/presentation/widgets/attachment_card.dart';
 
 import '../../../../core/ui/format/date_format.dart';
 import '../../../../core/ui/theme/app_theme.dart';
@@ -264,18 +265,97 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
             //.......................
             //Attachments
             Text("ATTACHMENTS"),
-            Container(
-              color: Colors.blueGrey,
-              width: AppSpacing.size100,
-              height: AppSpacing.size100,
+
+            Wrap(
+              spacing: AppSpacing.smmd,
+              runSpacing: AppSpacing.smmd,
+              children: [
+                if (attachments != null)
+                  ...attachments!.map((entry) {
+                    return AttachmentCard(
+                      imageUrl: entry,
+                      onDelete: () {
+                        debugPrint("Delete Attachment");
+                      },
+                      onTap: () {
+                        debugPrint("View Attachment");
+                      },
+                    );
+                  })
+                else
+                  Text("No attachments yet"),
+              ],
             ),
+
+            // Add Button
+            TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.attach_file),
+              label: Text("Add Attachment"),
+            ),
+
             SizedBox(height: AppSpacing.lg),
 
             //...............................
             // Split transaction
-            Text("SPLIT TRANSACTION"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("SPLIT TRANSACTION"),
+                splits != null && splits!.isNotEmpty
+                    ? TextButton(onPressed: () {}, child: Text("Edit Split"))
+                    : TextButton(onPressed: () {}, child: Text("Add Split")),
+              ],
+            ),
+
+            splits != null && splits!.isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: splits?.length,
+                    itemBuilder: (context, index) {
+                      final split = splits![index];
+                      return Row(
+                        children: [
+                          Icon(getIconDataFromString(split.category)),
+                          Text(split.category),
+                          Spacer(),
+                          Text(widget.currencySymbol + split.amount.toString()),
+                        ],
+                      );
+                    },
+                  )
+                : Text("No items"),
+
             // Add & remove spliting transaction ui
             SizedBox(height: AppSpacing.lg),
+
+            //.........................
+            // Audit
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text("Created"),
+                Text(
+                  formatFullDateTime(transaction.createdAt ?? DateTime.now()),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text("Last Updated"),
+                Text(
+                  formatFullDateTime(transaction.updatedAt ?? DateTime.now()),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [Text("Applied Rule"), Text("Auto-categorized")],
+            ),
+
+            SizedBox(height: AppSpacing.size42),
           ],
         ),
       ),
