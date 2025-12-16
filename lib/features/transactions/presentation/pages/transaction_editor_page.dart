@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:xpens_flow/core/common/utils/icon_helper.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
@@ -34,6 +35,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
   late TextEditingController _descriptionController;
 
   late Transaction transaction;
+  late int id;
   late String amountText;
 
   late String categoryText;
@@ -56,6 +58,8 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     super.initState();
     transaction = widget.transaction;
     bool isExpense = transaction.type == TransactionType.expense;
+
+    id = transaction.id!;
     amountText = isExpense
         ? "${widget.currencySymbol}${transaction.amount}"
         : "${widget.currencySymbol}${transaction.amount}";
@@ -78,6 +82,12 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
 
     _merchantController = TextEditingController(text: merchantNote);
     _descriptionController = TextEditingController(text: description);
+  }
+
+  void _updateTransaction(Transaction transaction) {
+    debugPrint('''Updated transaction: ${transaction.id}, ${transaction.amount},
+    ${transaction.type}
+    ''');
   }
 
   @override
@@ -147,11 +157,24 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
             //.......................
             /// Category
             Text("CATEGORY"),
-            ListTile(
-              leading: Icon(getIconDataFromString(categoryText)),
-              title: Text(categoryText),
-              trailing: Icon(Icons.arrow_forward_ios),
+
+            PopupMenuButton(
+              onSelected: (value) {},
+              itemBuilder: (context) {
+                return ["House", "Rent", "Groceries", "Bill"].map((item) {
+                  return PopupMenuItem(value: item, child: Text(item));
+                }).toList();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Icon(getIconDataFromString(categoryText)),
+                  Text(categoryText),
+                  Icon(Icons.arrow_drop_down),
+                ],
+              ),
             ),
+
             SizedBox(height: AppSpacing.lg),
 
             ///.............................
@@ -362,7 +385,36 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
 
       bottomNavigationBar:
           // Delete
-          FilledButton(onPressed: () {}, child: Text("Save Changes")),
+          FilledButton(
+            onPressed: () {
+              String amount = _amountController.text.replaceAll(
+                RegExp(RegExp.escape(widget.currencySymbol)),
+                "",
+              );
+
+              final updatedTransaction = Transaction(
+                id: id,
+                amount: double.parse(amount),
+                category: categoryText,
+                type: selectedType!,
+                merchant_note: merchantNote,
+                date_time: dateTime,
+                account: account,
+                description: description,
+                tags: tags,
+                isTransfer: isTransfer,
+                isRecurring: isRecurring,
+                attachments: attachments,
+                splits: splits,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                appliedRule: appliedRule,
+              );
+
+              _updateTransaction(updatedTransaction);
+            },
+            child: Text("Save Changes"),
+          ),
     );
   }
 }

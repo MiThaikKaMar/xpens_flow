@@ -99,7 +99,7 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
     final noteText = noteEditingController.text.trim();
     debugPrint("NoteText: $noteText");
 
-    final newTransaction = TransactionModel(
+    final newTransaction = Transaction(
       amount: amount,
       category: _selectedCategory,
       type: _selectedTransactionType,

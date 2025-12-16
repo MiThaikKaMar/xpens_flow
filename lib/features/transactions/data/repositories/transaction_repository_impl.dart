@@ -17,13 +17,15 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<Either<Failure, void>> addTransaction(Transaction transaction) async {
     try {
-      final transactionModel = TransactionModel(
-        amount: transaction.amount,
-        category: transaction.category,
-        type: transaction.type,
-        merchant_note: transaction.merchant_note,
-        date_time: transaction.date_time,
-      );
+      // final transactionModel = TransactionModel(
+      //   amount: transaction.amount,
+      //   category: transaction.category,
+      //   type: transaction.type,
+      //   merchant_note: transaction.merchant_note,
+      //   date_time: transaction.date_time,
+      // );
+
+      final transactionModel = TransactionModel.fromEntity(transaction);
 
       await localDataSource.insertTransaction(transactionModel);
 
@@ -98,14 +100,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
   ) async {
     {
       try {
-        final transactionModel = TransactionModel(
-          id: transaction.id,
-          amount: transaction.amount,
-          category: transaction.category,
-          type: transaction.type,
-          merchant_note: transaction.merchant_note,
-          date_time: transaction.date_time,
-        );
+        // final transactionModel = TransactionModel(
+        //   id: transaction.id,
+        //   amount: transaction.amount,
+        //   category: transaction.category,
+        //   type: transaction.type,
+        //   merchant_note: transaction.merchant_note,
+        //   date_time: transaction.date_time,
+        // );
+
+        final transactionModel = TransactionModel.fromEntity(transaction);
 
         await localDataSource.updateTransaction(transactionModel);
         return const Right(null);
