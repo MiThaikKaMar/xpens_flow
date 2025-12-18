@@ -8,7 +8,6 @@ import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
 import 'package:xpens_flow/core/ui/theme/app_theme.dart';
 import 'package:xpens_flow/core/ui/theme/typography.dart';
-import 'package:xpens_flow/features/transactions/data/models/transaction_model.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 

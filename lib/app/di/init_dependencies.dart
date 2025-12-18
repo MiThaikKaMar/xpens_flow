@@ -25,6 +25,7 @@ import 'package:xpens_flow/features/transactions/data/repositories/transaction_r
 import 'package:xpens_flow/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/add_transaction.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/list_transactions.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
 final serviceLocator = GetIt.instance;
@@ -98,6 +99,12 @@ void _transaction() {
       addTransaction: serviceLocator<AddTransaction>(),
       listTransactions: serviceLocator<ListTransactions>(),
       getCurrentCurrency: serviceLocator<GetCurrentCurrency>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<TransactionEditorBloc>(
+    () => TransactionEditorBloc(
+      getAllCategories: serviceLocator<GetSelectedCategories>(),
     ),
   );
 }
