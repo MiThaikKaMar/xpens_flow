@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
@@ -38,6 +39,7 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
   late TextEditingController _amountController;
   late TextEditingController _merchantController;
   late TextEditingController _descriptionController;
+  late TextEditingController _addTagEditingController;
 
   late Transaction transaction;
   late int id;
@@ -90,14 +92,63 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
 
     _merchantController = TextEditingController(text: merchantNote);
     _descriptionController = TextEditingController(text: description);
+    _addTagEditingController = TextEditingController();
+    //tags = ["Business", "Client"];
+    // attachments = [
+    //   '/data/user/0/com.mollydev.xpens_flow/cache/file_picker/1766147217876/edit.png',
+    //   '/data/user/0/com.mollydev.xpens_flow/cache/file_picker/1766147221496/edit_transaction.png',
+    // ];
   }
 
-  void _submitTransaction(Transaction transaction) {
+  void _handleSubmitTransaction(Transaction transaction) {
     debugPrint('''Updated transaction: ${transaction.id}, ${transaction.amount},
     ${transaction.type} , ${transaction.category}, ${transaction.merchant_note},
-${transaction.date_time}
+${transaction.date_time}, ${transaction.description}, ${transaction.tags} , 
+${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments}
 
     ''');
+  }
+
+  void _handleAddTag(String tag, BuildContext dialogContext) {
+    tags ??= [];
+    tags!.add(tag);
+    setState(() {
+      Navigator.pop(dialogContext);
+    });
+  }
+
+  void _handleRemoveTag(String tag) {
+    setState(() {
+      tags!.remove(tag);
+    });
+  }
+
+  Future<void> _handleFilePicker() async {
+    String? filePath;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowMultiple: false,
+      allowedExtensions: ['jpg', 'png'],
+    );
+
+    if (result != null) {
+      filePath = result.files.single.path!;
+      debugPrint("FilePath: $filePath");
+
+      attachments ??= [];
+      setState(() {
+        attachments?.add(filePath!);
+      });
+    } else {
+      //User canceled the picker
+    }
+  }
+
+  void _handleRemoveAttachment(String filePath) {
+    setState(() {
+      attachments?.remove(filePath);
+    });
   }
 
   @override
@@ -338,14 +389,40 @@ ${transaction.date_time}
                       return Chip(
                         label: Text(tag),
                         deleteIcon: Icon(Icons.close),
-                        onDeleted: () {},
-
-                        //_removeTag(tag),
+                        onDeleted: () {
+                          _handleRemoveTag(tag);
+                        },
                       );
                     }).toList(),
                   ),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                _addTagEditingController.clear();
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) {
+                    return AlertDialog(
+                      title: Text("Add New Tag"),
+                      content: TextField(controller: _addTagEditingController),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                          },
+                          child: Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () => _handleAddTag(
+                            _addTagEditingController.text.trim(),
+                            dialogContext,
+                          ),
+                          child: Text("Add"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
               label: Text("Add Tag"),
               icon: Icon(Icons.add),
             ),
@@ -396,7 +473,7 @@ ${transaction.date_time}
                     return AttachmentCard(
                       imageUrl: entry,
                       onDelete: () {
-                        debugPrint("Delete Attachment");
+                        _handleRemoveAttachment(entry);
                       },
                       onTap: () {
                         debugPrint("View Attachment");
@@ -410,7 +487,9 @@ ${transaction.date_time}
 
             // Add Button
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                await _handleFilePicker();
+              },
               icon: Icon(Icons.attach_file),
               label: Text("Add Attachment"),
             ),
@@ -491,6 +570,7 @@ ${transaction.date_time}
               );
 
               String merchantNote = _merchantController.text.trim();
+              String description = _descriptionController.text.trim();
 
               final updatedTransaction = Transaction(
                 id: id,
@@ -511,7 +591,7 @@ ${transaction.date_time}
                 appliedRule: appliedRule,
               );
 
-              _submitTransaction(updatedTransaction);
+              _handleSubmitTransaction(updatedTransaction);
             },
             child: Text("Save Changes"),
           ),

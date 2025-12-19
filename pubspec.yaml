@@ -32,6 +32,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   currency_picker: ^2.0.21
   equatable: ^2.0.7
+  file_picker: ^10.3.8
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
@@ -62,9 +63,8 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icons/ic_launcher.png"
-  adaptive_icon_background: "#FFFFFF"  # Your color here
+  adaptive_icon_background: "#FFFFFF" # Your color here
   min_sdk_android: 21 # android min sdk min:16, default 21
-
 
 names_launcher:
   name: "Xpens Flow"
@@ -73,7 +73,6 @@ names_launcher:
       enable: true
     ios:
       enable: true
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
