@@ -17,8 +17,10 @@ import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_detail_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_editor_page.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/split/transaction_split_cubit.dart';
 
 import '../../core/common/utils/app_strings.dart';
 import '../../features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
@@ -36,8 +38,8 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
-    initialLocation: Routes.welcome,
-    //initialLocation: Routes.transactionDetail,
+    //initialLocation: Routes.welcome,
+    initialLocation: '/test/split',
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();
@@ -115,6 +117,45 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(
+        path: Routes.transactionSplit,
+        builder: (context, state) {
+          final idString = state.pathParameters['id']!;
+          final transactionId = int.parse(idString);
+          final extras = state.extra as Map<String, dynamic>;
+          final transaction = extras['transaction'] as Transaction;
+          final currencySymbol = extras['symbol'] as String;
+          return TransactionSplitPage(
+            transactionId: transactionId,
+            transaction: transaction,
+            currencySymbol: currencySymbol,
+            transactionSplitCubit: serviceLocator<TransactionSplitCubit>(),
+          );
+        },
+      ),
+
+      // For Ui wareframe preparing
+      GoRoute(
+        path: '/test/split',
+        builder: (context, state) {
+          final dummyTransaction = Transaction(
+            id: 123,
+            amount: 5400.0,
+            date_time: DateTime.now(),
+            category: "Housing",
+            type: TransactionType.expense,
+            description: 'Test Split Transaction',
+            // add other required fields
+          );
+          return TransactionSplitPage(
+            transactionId: dummyTransaction.id!,
+            transaction: dummyTransaction,
+            currencySymbol: '\$',
+            transactionSplitCubit: serviceLocator<TransactionSplitCubit>(),
+          );
+        },
+      ),
+
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainPage(navigationShell: navigationShell);
