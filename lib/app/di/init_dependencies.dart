@@ -111,7 +111,9 @@ void _transaction() {
 
   // Cubit
   serviceLocator.registerLazySingleton<TransactionSplitCubit>(
-    () => TransactionSplitCubit(),
+    () => TransactionSplitCubit(
+      getAllCategories: serviceLocator<GetSelectedCategories>(),
+    ),
   );
   // final cubit = serviceLocator<TransactionSplitCubit>(param1: 150.0);
 }

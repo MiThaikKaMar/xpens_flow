@@ -1,149 +1,205 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:xpens_flow/core/data/models/category_model.dart';
+import 'package:xpens_flow/core/domain/usecases/get_selected_categories.dart';
+import 'package:xpens_flow/core/domain/usecases/usecase.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
 
 part 'transaction_split_state.dart';
 
 class TransactionSplitCubit extends Cubit<TransactionSplitState> {
-  TransactionSplitCubit() : super(TransactionSplitInitial(totalAmount: 0));
+  final GetSelectedCategories _getAllCategories;
+
+  TransactionSplitCubit({required getAllCategories})
+    : _getAllCategories = getAllCategories,
+      super(TransactionSplitInitial());
+
+  // Initialize split management
+  void initializeSplitManagement(double totalAmount) {
+    emit(SplitManagementState(totalAmount: totalAmount));
+  }
+
+  void loadAllCategories() {
+    emit(CategoriesLoading());
+
+    try {
+      final categoriesResult = _getAllCategories(NoParams());
+      categoriesResult.fold(
+        (failure) {
+          emit(CategoriesError(message: failure.message));
+        },
+        (categories) {
+          emit(CategoriesLoaded(categories: categories));
+        },
+      );
+    } catch (e) {
+      emit(CategoriesError(message: e.toString()));
+    }
+  }
 
   // Update selected category
   void updateCategory(String category) {
-    emit(state.copyWith(selectedCategory: category));
+    if (state is SplitManagementState) {
+      final currentState = state as SplitManagementState;
+      emit(
+        currentState.copyWith(selectedCategory: category, errorMessage: null),
+      );
+    }
+    //emit(state.copyWith(selectedCategory: category));
   }
 
   // Update current amount being entered
-  void updateAmount(double amount) {
-    emit(state.copyWith(currentAmount: amount));
+  void updateAmount(double? amount) {
+    if (state is SplitManagementState) {
+      final currentState = state as SplitManagementState;
+      emit(currentState.copyWith(currentAmount: amount, errorMessage: null));
+    }
+    //emit(state.copyWith(currentAmount: amount));
   }
 
   //Update note
   void updateNote(String note) {
-    emit(state.copyWith(currentNote: note));
+    if (state is SplitManagementState) {
+      final currentState = state as SplitManagementState;
+      emit(currentState.copyWith(currentNote: note, errorMessage: null));
+    }
+    //emit(state.copyWith(currentNote: note));
+  }
+
+  // Add a split
+  void addSplit() {
+    if (state is! SplitManagementState) return;
+
+    final currentState = state as SplitManagementState;
+
+    // Basic validation
+    if (currentState.selectedCategory == null ||
+        currentState.selectedCategory == "Select category") {
+      emit(currentState.copyWith(errorMessage: 'Please select a category'));
+      return;
+    }
+
+    if (currentState.currentAmount == null ||
+        currentState.currentAmount! <= 0) {
+      emit(currentState.copyWith(errorMessage: 'Please enter a valid amount'));
+      return;
+    }
+
+    final newSplit = TransactionSplit(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+
+      category: currentState.selectedCategory!,
+      amount: currentState.currentAmount!,
+      note: currentState.currentNote,
+    );
+
+    final updatedSplits = List<TransactionSplit>.from(
+      currentState.currentSplits,
+    )..add(newSplit);
+
+    emit(
+      currentState.copyWith(
+        currentSplits: updatedSplits,
+        selectedCategory: null, // Reset form
+        currentAmount: null,
+        currentNote: null,
+        errorMessage: null,
+      ),
+    );
   }
 
   // Quick split in half
   void splitInHalf() {
-    final amount = state.remainingToAllocate / 2;
+    if (state is! SplitManagementState) return;
+
+    final currentState = state as SplitManagementState;
+    if (currentState.remainingToAllocate <= 0) return;
+    final amount = currentState.remainingToAllocate / 2;
     _addEqualSplits(2, amount);
   }
 
   //Quick split in thirds
   void splitInThirds() {
-    final amount = state.remainingToAllocate / 3;
+    if (state is! SplitManagementState) return;
+
+    final currentState = state as SplitManagementState;
+    if (currentState.remainingToAllocate <= 0) return;
+    final amount = currentState.remainingToAllocate / 3;
     _addEqualSplits(3, amount);
   }
 
   // Helper method for equal splits
   void _addEqualSplits(int count, double amount) {
-    final newSplits = List<TransactionSplit>.from(state.currentSplits);
+    if (state is! SplitManagementState) return;
+
+    final currentState = state as SplitManagementState;
+
+    final newSplits = List<TransactionSplit>.from(currentState.currentSplits);
 
     for (int i = 0; i < count; i++) {
       newSplits.add(
         TransactionSplit(
-          category: state.selectedCategory ?? 'Uncategoried',
+          id: '${DateTime.now().millisecondsSinceEpoch}_$i',
+          category: 'Uncategoried',
           amount: amount,
+          note: 'Auto-split ${i + 1}/$count',
         ),
       );
     }
 
     emit(
-      state.copyWith(
-        currentSplits: newSplits,
-        selectedCategory: null,
-        currentAmount: null,
-        currentNote: null,
-      ),
+      currentState.copyWith(currentSplits: newSplits, selectedCategory: null),
     );
   }
 
-  // Add a split
-  void addSplit() {
-    //Basic validation
-    if (state.selectedCategory == null ||
-        state.currentAmount == null ||
-        state.currentAmount! <= 0 ||
-        state.currentAmount! > state.remainingToAllocate) {
-      emit(
-        TransactionSplitError(
-          message: 'Invalid input. Please check category and amount.',
-          totalAmount: state.totalAmount,
-          currentSplits: state.currentSplits,
-          selectedCategory: state.selectedCategory,
-          currentAmount: state.currentAmount,
-          currentNote: state.currentNote,
-        ),
-      );
-      return;
-    }
+  // Remove a split
+  void removeSplit(String splitId) {
+    if (state is! SplitManagementState) return;
 
-    final newSplit = TransactionSplit(
-      category: state.selectedCategory!,
-      amount: state.currentAmount!,
-      note: state.currentNote ?? '',
-    );
+    final currentState = state as SplitManagementState;
+    final updateSplits = currentState.currentSplits
+        .where((split) => split.id != splitId)
+        .toList();
 
-    final updatedSplits = List<TransactionSplit>.from(state.currentSplits)
-      ..add(newSplit);
-
-    emit(
-      state.copyWith(
-        currentSplits: updatedSplits,
-        selectedCategory: null,
-        currentAmount: null,
-        currentNote: null,
-      ),
-    );
+    emit(currentState.copyWith(currentSplits: updateSplits));
   }
 
   // Clear error state
   void clearError() {
-    emit(
-      TransactionSplitUpdated(
-        totalAmount: state.totalAmount,
-        currentSplits: state.currentSplits,
-        selectedCategory: state.selectedCategory,
-        currentAmount: state.currentAmount,
-        currentNote: state.currentNote,
-      ),
-    );
+    if (state is SplitManagementState) {
+      final currentState = state as SplitManagementState;
+      emit(currentState.copyWith(errorMessage: null));
+    }
   }
 
-  // Complete the split
-  void completeSplit() {
-    if (state.remainingToAllocate > 0) {
+  // Save splits (this is where you'd persist to storage)
+  void saveSplits() {
+    if (state is! SplitManagementState) return;
+
+    final currentState = state as SplitManagementState;
+
+    if (currentState.currentSplits.isEmpty) {
       emit(
-        TransactionSplitError(
-          message: 'Please allocate the full amount before completing',
-          totalAmount: state.totalAmount,
-          currentSplits: state.currentSplits,
-          selectedCategory: state.selectedCategory,
-          currentAmount: state.currentAmount,
-          currentNote: state.currentNote,
+        currentState.copyWith(errorMessage: 'Please add at least one split'),
+      );
+      return;
+    }
+
+    if (currentState.remainingToAllocate > 0) {
+      emit(
+        currentState.copyWith(
+          errorMessage: 'Please allocate the full amount before saving',
         ),
       );
       return;
     }
 
-    if (state.currentSplits.isEmpty) {
-      emit(
-        TransactionSplitError(
-          message: 'Please add at least one split',
-          totalAmount: state.totalAmount,
-          currentSplits: state.currentSplits,
-          selectedCategory: state.selectedCategory,
-          currentAmount: state.currentAmount,
-          currentNote: state.currentNote,
-        ),
-      );
-      return;
-    }
+    // Here you would save to storage
+    // For now, just emit success or navigate back
+    debugPrint('Saving splits: ${currentState.currentSplits}');
 
-    emit(
-      TransactionSplitComplete(
-        totalAmount: state.totalAmount,
-        currentSplits: state.currentSplits,
-      ),
-    );
+    //Navigate back or show success message
+    //Navigator.of(context).pop(currentState.currentSplits);
   }
 }

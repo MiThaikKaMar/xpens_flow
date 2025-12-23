@@ -4,7 +4,7 @@ import '../tables/transaction_split_table.dart';
 
 class TransactionSplitModel extends TransactionSplit {
   TransactionSplitModel({
-    super.id,
+    required super.id,
     super.transactionId,
     required super.category,
     required super.amount,
@@ -23,7 +23,7 @@ class TransactionSplitModel extends TransactionSplit {
 
   factory TransactionSplitModel.fromMap(Map<String, dynamic> map) {
     return TransactionSplitModel(
-      id: map[TransactionSplitTable.columnId] as int?,
+      id: map[TransactionSplitTable.columnId] as String,
       transactionId: map[TransactionSplitTable.columnTransactionId] as int?,
       category: map[TransactionSplitTable.columnCategory] as String,
       amount: (map[TransactionSplitTable.columnAmount] as num).toDouble(),
@@ -44,7 +44,7 @@ class TransactionSplitModel extends TransactionSplit {
 
   // Copy with method
   TransactionSplitModel copyWith({
-    int? id,
+    String? id,
     int? transactionId,
     String? category,
     double? amount,

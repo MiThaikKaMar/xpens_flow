@@ -1,14 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class TransactionSplit {
-  final int? id;
+  final String id;
   final int? transactionId; //Foreign key to parent transaction
   final String category;
   final double amount;
   final String? note;
 
   TransactionSplit({
-    this.id,
+    required this.id,
     this.transactionId,
     required this.category,
     required this.amount,

@@ -129,7 +129,6 @@ class AppRouter {
             transactionId: transactionId,
             transaction: transaction,
             currencySymbol: currencySymbol,
-            transactionSplitCubit: serviceLocator<TransactionSplitCubit>(),
           );
         },
       ),
@@ -151,7 +150,6 @@ class AppRouter {
             transactionId: dummyTransaction.id!,
             transaction: dummyTransaction,
             currencySymbol: '\$',
-            transactionSplitCubit: serviceLocator<TransactionSplitCubit>(),
           );
         },
       ),
