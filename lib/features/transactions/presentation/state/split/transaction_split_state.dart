@@ -77,6 +77,7 @@ class SplitManagementState extends TransactionSplitState {
   final double? currentAmount;
   final String? currentNote;
   final String? errorMessage;
+  final int maxSplits;
 
   SplitManagementState({
     required this.totalAmount,
@@ -85,6 +86,7 @@ class SplitManagementState extends TransactionSplitState {
     this.currentAmount,
     this.currentNote,
     this.errorMessage,
+    this.maxSplits = 10,
   });
 
   double get remainingToAllocate {
@@ -104,6 +106,7 @@ class SplitManagementState extends TransactionSplitState {
     double? currentAmount,
     String? currentNote,
     String? errorMessage,
+    int? maxSplits,
   }) {
     return SplitManagementState(
       totalAmount: totalAmount ?? this.totalAmount,
@@ -112,6 +115,7 @@ class SplitManagementState extends TransactionSplitState {
       currentAmount: currentAmount ?? this.currentAmount,
       currentNote: currentNote ?? this.currentNote,
       errorMessage: errorMessage,
+      maxSplits: maxSplits ?? this.maxSplits,
     );
   }
 
@@ -123,5 +127,6 @@ class SplitManagementState extends TransactionSplitState {
     currentAmount,
     currentNote,
     errorMessage,
+    maxSplits,
   ];
 }

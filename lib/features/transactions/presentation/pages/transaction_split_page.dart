@@ -28,6 +28,7 @@ class TransactionSplitPage extends StatefulWidget {
 
 class _TransactionSplitPageState extends State<TransactionSplitPage> {
   late Transaction transaction;
+  late int transactionId;
   late String currencySymbol;
   late String newSplitCategory;
 
@@ -41,6 +42,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     super.initState();
 
     transaction = widget.transaction;
+    transactionId = transaction.id!;
     currencySymbol = widget.currencySymbol;
 
     newSplitCategory = 'Select category';
@@ -175,7 +177,9 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
             children: [
               GestureDetector(
                 onTap: () {
-                  context.read<TransactionSplitCubit>().splitInHalf();
+                  context.read<TransactionSplitCubit>().splitInHalf(
+                    transactionId,
+                  );
                 },
                 child: Card(
                   child: Column(children: [Text("1/2"), Text("Split in half")]),
@@ -183,7 +187,9 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  context.read<TransactionSplitCubit>().splitInThirds();
+                  context.read<TransactionSplitCubit>().splitInThirds(
+                    transactionId,
+                  );
                 },
                 child: Card(
                   child: Column(
@@ -201,9 +207,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text("Current Splits"),
-              Text(
-                "${state.splitCount} of ${state.totalAmount / (state.splitCount > 0 ? state.currentSplits.first.amount : state.totalAmount).ceil()}",
-              ),
+              Text("${state.splitCount} of ${state.maxSplits}"),
             ],
           ),
           if (state.currentSplits.isEmpty)
@@ -300,7 +304,9 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
               if (state is SplitManagementState) {
                 return FilledButton(
                   onPressed: () {
-                    context.read<TransactionSplitCubit>().addSplit();
+                    context.read<TransactionSplitCubit>().addSplit(
+                      transactionId,
+                    );
                     // Clear form
                     _newAmountController.clear();
                     _newNoteController.clear();

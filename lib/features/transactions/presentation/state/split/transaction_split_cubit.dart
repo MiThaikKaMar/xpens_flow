@@ -16,8 +16,8 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
       super(TransactionSplitInitial());
 
   // Initialize split management
-  void initializeSplitManagement(double totalAmount) {
-    emit(SplitManagementState(totalAmount: totalAmount));
+  void initializeSplitManagement(double totalAmount, {int maxSplits = 10}) {
+    emit(SplitManagementState(totalAmount: totalAmount, maxSplits: maxSplits));
   }
 
   void loadAllCategories() {
@@ -68,7 +68,7 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
   }
 
   // Add a split
-  void addSplit() {
+  void addSplit(int transactionId) {
     if (state is! SplitManagementState) return;
 
     final currentState = state as SplitManagementState;
@@ -86,9 +86,27 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
       return;
     }
 
+    if (currentState.currentAmount! > currentState.remainingToAllocate) {
+      emit(
+        currentState.copyWith(
+          errorMessage: 'Amount exceeds remaining to allocate',
+        ),
+      );
+      return;
+    }
+
+    if (currentState.currentSplits.length >= currentState.maxSplits) {
+      emit(
+        currentState.copyWith(
+          errorMessage: 'Maximun ${currentState.maxSplits} splits allowed',
+        ),
+      );
+      return;
+    }
+
     final newSplit = TransactionSplit(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
-
+      transactionId: transactionId,
       category: currentState.selectedCategory!,
       amount: currentState.currentAmount!,
       note: currentState.currentNote,
@@ -110,37 +128,43 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
   }
 
   // Quick split in half
-  void splitInHalf() {
+  void splitInHalf(int transactionId) {
     if (state is! SplitManagementState) return;
 
     final currentState = state as SplitManagementState;
     if (currentState.remainingToAllocate <= 0) return;
     final amount = currentState.remainingToAllocate / 2;
-    _addEqualSplits(2, amount);
+    _addEqualSplits(2, amount, transactionId);
   }
 
   //Quick split in thirds
-  void splitInThirds() {
+  void splitInThirds(int transactionId) {
     if (state is! SplitManagementState) return;
 
     final currentState = state as SplitManagementState;
     if (currentState.remainingToAllocate <= 0) return;
     final amount = currentState.remainingToAllocate / 3;
-    _addEqualSplits(3, amount);
+    _addEqualSplits(3, amount, transactionId);
   }
 
   // Helper method for equal splits
-  void _addEqualSplits(int count, double amount) {
+  void _addEqualSplits(int count, double amount, int transactionId) {
     if (state is! SplitManagementState) return;
 
     final currentState = state as SplitManagementState;
 
     final newSplits = List<TransactionSplit>.from(currentState.currentSplits);
 
+    if (newSplits.length + count > currentState.maxSplits) {
+      emit(currentState.copyWith(errorMessage: "Too many splits"));
+      return;
+    }
+
     for (int i = 0; i < count; i++) {
       newSplits.add(
         TransactionSplit(
           id: '${DateTime.now().millisecondsSinceEpoch}_$i',
+          transactionId: transactionId,
           category: 'Uncategoried',
           amount: amount,
           note: 'Auto-split ${i + 1}/$count',
@@ -197,7 +221,12 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
 
     // Here you would save to storage
     // For now, just emit success or navigate back
-    debugPrint('Saving splits: ${currentState.currentSplits}');
+
+    for (var e in currentState.currentSplits) {
+      debugPrint(
+        "Saved split: ${e.amount}, ${e.category} , ${e.note} , ${e.transactionId} , ${e.id}",
+      );
+    }
 
     //Navigate back or show success message
     //Navigator.of(context).pop(currentState.currentSplits);
