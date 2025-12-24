@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart';
 import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/domain/usecases/get_selected_categories.dart';
 import 'package:xpens_flow/core/domain/usecases/usecase.dart';
@@ -16,7 +17,12 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
       super(TransactionSplitInitial());
 
   // In your TransactionSplitCubit
-  void loadCategoriesAndInitialize(double totalAmount, {int maxSplits = 10}) {
+  void loadCategoriesAndInitialize(
+    double totalAmount, {
+
+    List<TransactionSplit>? initialSplits,
+    int maxSplits = 10,
+  }) {
     emit(CategoriesLoading());
 
     try {
@@ -34,6 +40,7 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
             SplitManagementState(
               totalAmount: totalAmount,
               maxSplits: maxSplits,
+              currentSplits: initialSplits ?? [],
             ),
           );
         },
@@ -253,6 +260,7 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
 
     // Here you would save to storage
     // For now, just emit success or navigate back
+    // Navigator.of(context).pop(currentState.currentSplits);
 
     for (var e in currentState.currentSplits) {
       debugPrint(
@@ -261,6 +269,6 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
     }
 
     //Navigate back or show success message
-    //Navigator.of(context).pop(currentState.currentSplits);
+    emit(SplitsSavedSuccess(splits: currentState.currentSplits));
   }
 }

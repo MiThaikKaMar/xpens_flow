@@ -15,6 +15,7 @@ import 'package:xpens_flow/features/onboarding/presentation/pages/first_run_setu
 import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
+import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_detail_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_editor_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
@@ -124,10 +125,17 @@ class AppRouter {
           final extras = state.extra as Map<String, dynamic>;
           final transaction = extras['transaction'] as Transaction;
           final currencySymbol = extras['symbol'] as String;
+
+          //Use List.from to prevent cast errors if it comes back as List<dynamci>
+          final rawSplits = extras['existingSplits'];
+          final existingSplits = rawSplits != null
+              ? List<TransactionSplit>.from(rawSplits)
+              : <TransactionSplit>[];
           return TransactionSplitPage(
             transactionId: transactionId,
             transaction: transaction,
             currencySymbol: currencySymbol,
+            existingSplits: existingSplits,
           );
         },
       ),

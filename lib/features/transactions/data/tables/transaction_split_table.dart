@@ -10,7 +10,7 @@ class TransactionSplitTable {
   static const String createTableSQL =
       '''
 CREATE TABLE $tableName(
-  $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+  $columnId TEXT PRIMARY KEY,
   $columnTransactionId INTEGER NOT NULL,
   $columnCategory TEXT NOT NULL,
   $columnAmount REAL NOT NULL,

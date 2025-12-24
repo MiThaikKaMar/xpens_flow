@@ -130,3 +130,12 @@ class SplitManagementState extends TransactionSplitState {
     maxSplits,
   ];
 }
+
+final class SplitsSavedSuccess extends TransactionSplitState {
+  final List<TransactionSplit> splits;
+
+  SplitsSavedSuccess({required this.splits});
+
+  @override
+  List<Object?> get props => [splits];
+}

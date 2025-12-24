@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xpens_flow/core/common/utils/icon_helper.dart';
-import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
+import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/split/transaction_split_cubit.dart';
 
 import '../../../../core/ui/theme/spacing.dart';
@@ -12,12 +12,14 @@ class TransactionSplitPage extends StatefulWidget {
   final int transactionId;
   final Transaction transaction;
   final String currencySymbol;
+  final List<TransactionSplit>? existingSplits;
 
   const TransactionSplitPage({
     super.key,
     required this.transactionId,
     required this.transaction,
     required this.currencySymbol,
+    this.existingSplits,
   });
 
   @override
@@ -48,9 +50,11 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     _newAmountController = TextEditingController();
     _newNoteController = TextEditingController();
 
+    debugPrint("Existing Splits : ${widget.existingSplits?.length}");
     // Initialize everything at once
     context.read<TransactionSplitCubit>().loadCategoriesAndInitialize(
       transaction.amount,
+      initialSplits: widget.existingSplits,
     );
     //Initialize split management and load categories
     // context.read<TransactionSplitCubit>().initializeSplitManagement(
@@ -286,9 +290,9 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
           }
 
           // Handle successful save
-          //   if (state is SplitsSaved) {
-          //   Navigator.of(context).pop();
-          // }
+          if (state is SplitsSavedSuccess) {
+            Navigator.of(context).pop(state.splits);
+          }
           //Handle categories loaded
           // if (state is CategoriesLoaded) {
           //   allCategories = state.categories;

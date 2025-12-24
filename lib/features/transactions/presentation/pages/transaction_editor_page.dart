@@ -107,7 +107,8 @@ class _TransactionEditorPageState extends State<TransactionEditorPage> {
     debugPrint('''Updated transaction: ${transaction.id}, ${transaction.amount},
     ${transaction.type} , ${transaction.category}, ${transaction.merchant_note},
 ${transaction.date_time}, ${transaction.description}, ${transaction.tags} , 
-${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments}
+${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments},
+${transaction.splits}, ${transaction.createdAt}, ${transaction.updatedAt}
 
     ''');
   }
@@ -152,6 +153,27 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
     setState(() {
       attachments?.remove(filePath);
     });
+  }
+
+  void _handleSplitActions() {
+    debugPrint("splits in editor: ${splits?.length}");
+    context
+        .push<List<TransactionSplit>>(
+          Routes.transactionSplit.replaceAll(':id', transaction.id.toString()),
+          extra: {
+            'transaction': transaction,
+            'symbol': widget.currencySymbol,
+            'existingSplits': splits,
+          },
+        )
+        .then((result) {
+          //Handle the return data
+          if (result != null) {
+            setState(() {
+              splits = result;
+            });
+          }
+        });
   }
 
   @override
@@ -507,33 +529,11 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
                 Text("SPLIT TRANSACTION"),
                 splits != null && splits!.isNotEmpty
                     ? TextButton(
-                        onPressed: () {
-                          context.push(
-                            Routes.transactionSplit.replaceAll(
-                              ':id',
-                              transaction.id.toString(),
-                            ),
-                            extra: {
-                              'transaction': transaction,
-                              'symbol': widget.currencySymbol,
-                            },
-                          );
-                        },
+                        onPressed: _handleSplitActions,
                         child: Text("Edit Split"),
                       )
                     : TextButton(
-                        onPressed: () {
-                          context.push(
-                            Routes.transactionSplit.replaceAll(
-                              ':id',
-                              transaction.id.toString(),
-                            ),
-                            extra: {
-                              'transaction': transaction,
-                              'symbol': widget.currencySymbol,
-                            },
-                          );
-                        },
+                        onPressed: _handleSplitActions,
                         child: Text("Add Split"),
                       ),
               ],
@@ -551,7 +551,10 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
                           Icon(getIconDataFromString(split.category)),
                           Text(split.category),
                           Spacer(),
-                          Text(widget.currencySymbol + split.amount.toString()),
+                          Text(
+                            widget.currencySymbol +
+                                split.amount.toStringAsFixed(2),
+                          ),
                         ],
                       );
                     },
@@ -618,7 +621,7 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
                 attachments: attachments,
                 splits: splits,
                 createdAt: createdAt,
-                updatedAt: updatedAt,
+                updatedAt: DateTime.now(),
                 appliedRule: appliedRule,
               );
 

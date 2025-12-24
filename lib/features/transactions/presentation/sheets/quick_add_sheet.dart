@@ -104,6 +104,7 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
       type: _selectedTransactionType,
       merchant_note: noteText.isNotEmpty ? noteText : null,
       date_time: displayDateTime,
+      createdAt: displayDateTime,
     );
 
     _transactionFeedBloc.add(TransactionFeedAdd(transaction: newTransaction));
