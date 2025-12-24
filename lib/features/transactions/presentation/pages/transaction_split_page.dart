@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xpens_flow/core/common/utils/icon_helper.dart';
 import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
-import 'package:xpens_flow/features/onboarding/presentation/cubit/category_cubit.dart';
-import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/split/transaction_split_cubit.dart';
 
 import '../../../../core/ui/theme/spacing.dart';
@@ -35,7 +33,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
   late TextEditingController _newAmountController;
   late TextEditingController _newNoteController;
 
-  late List<CategoryModel>? allCategories;
+  //late List<CategoryModel>? allCategories;
 
   @override
   void initState() {
@@ -50,11 +48,15 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     _newAmountController = TextEditingController();
     _newNoteController = TextEditingController();
 
-    //Initialize split management and load categories
-    context.read<TransactionSplitCubit>().initializeSplitManagement(
+    // Initialize everything at once
+    context.read<TransactionSplitCubit>().loadCategoriesAndInitialize(
       transaction.amount,
     );
-    context.read<TransactionSplitCubit>().loadAllCategories();
+    //Initialize split management and load categories
+    // context.read<TransactionSplitCubit>().initializeSplitManagement(
+    //   transaction.amount,
+    // );
+    //context.read<TransactionSplitCubit>().loadAllCategories();
     context.read<TransactionSplitCubit>().updateCategory(newSplitCategory);
 
     // Listen to text field changes
@@ -76,6 +78,9 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
   }
 
   Widget _buildSplitContent(BuildContext context, SplitManagementState state) {
+    //Get categories from the cubit directly
+    final cubit = context.read<TransactionSplitCubit>();
+    final allCategories = cubit.allCategories;
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -127,14 +132,21 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
             },
             itemBuilder: (context) {
               if (allCategories != null) {
-                return allCategories!.map((category) {
+                return allCategories.map((category) {
                   return PopupMenuItem(
                     value: category.label,
                     child: Text(category.label),
                   );
                 }).toList();
               }
-              return [];
+              return [
+                PopupMenuItem(
+                  value: 'No categories',
+
+                  enabled: false,
+                  child: Text('No categories available'),
+                ),
+              ];
             },
 
             child: ListTile(
@@ -144,6 +156,9 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
                     : 'Select a category',
               ),
               trailing: Icon(Icons.arrow_drop_down),
+              // subtitle: allCategories != null
+              //     ? Text('${allCategories.length} categories available')
+              //     : Text('Loading categories...'),
             ),
           ),
           SizedBox(height: AppSpacing.md),
@@ -274,30 +289,81 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
           //   if (state is SplitsSaved) {
           //   Navigator.of(context).pop();
           // }
+          //Handle categories loaded
+          // if (state is CategoriesLoaded) {
+          //   allCategories = state.categories;
+          //   context.read<TransactionSplitCubit>().initializeSplitManagement(
+          //     transaction.amount,
+          //   );
+          // }
         },
         builder: (context, state) {
+          // if (state is CategoriesLoading) {
+          //   return Center(child: CircularProgressIndicator());
+          // }
           if (state is CategoriesLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (state is CategoriesError) {
-            return Center(child: Text("Error: ${state.message}"));
-          }
-
-          if (state is CategoriesLoaded) {
-            allCategories = state.categories;
-            context.read<TransactionSplitCubit>().initializeSplitManagement(
-              transaction.amount,
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading categories...'),
+                ],
+              ),
             );
-            return Container();
           }
+
+          // if (state is CategoriesError) {
+          //   return Center(child: Text("Error: ${state.message}"));
+          // }
+          if (state is CategoriesError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error, size: 48, color: Colors.red),
+                  SizedBox(height: 16),
+                  Text("Error: ${state.message}"),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context
+                          .read<TransactionSplitCubit>()
+                          .loadCategoriesAndInitialize(transaction.amount);
+                    },
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          // if (state is CategoriesLoaded) {
+          //   allCategories = state.categories;
+          //   context.read<TransactionSplitCubit>().initializeSplitManagement(
+          //     transaction.amount,
+          //   );
+          //   return Container();
+          // }
 
           if (state is SplitManagementState) {
             return _buildSplitContent(context, state);
           }
-          return Container();
+          // Fallback
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Initializing...'),
+              ],
+            ),
+          );
         },
       ),
+
       bottomNavigationBar:
           BlocBuilder<TransactionSplitCubit, TransactionSplitState>(
             builder: (context, state) {
@@ -323,5 +389,3 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     );
   }
 }
-
-//https://poe.com/s/FDwftDBo0E2JDlbNDZpv

@@ -20,7 +20,6 @@ import 'package:xpens_flow/features/transactions/presentation/pages/transaction_
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
-import 'package:xpens_flow/features/transactions/presentation/state/split/transaction_split_cubit.dart';
 
 import '../../core/common/utils/app_strings.dart';
 import '../../features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
@@ -38,8 +37,8 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
-    //initialLocation: Routes.welcome,
-    initialLocation: '/test/split',
+    initialLocation: Routes.welcome,
+    //initialLocation: '/test/split',
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();
@@ -134,26 +133,25 @@ class AppRouter {
       ),
 
       // For Ui wareframe preparing
-      GoRoute(
-        path: '/test/split',
-        builder: (context, state) {
-          final dummyTransaction = Transaction(
-            id: 123,
-            amount: 5400.0,
-            date_time: DateTime.now(),
-            category: "Housing",
-            type: TransactionType.expense,
-            description: 'Test Split Transaction',
-            // add other required fields
-          );
-          return TransactionSplitPage(
-            transactionId: dummyTransaction.id!,
-            transaction: dummyTransaction,
-            currencySymbol: '\$',
-          );
-        },
-      ),
-
+      // GoRoute(
+      //   path: '/test/split',
+      //   builder: (context, state) {
+      //     final dummyTransaction = Transaction(
+      //       id: 123,
+      //       amount: 5400.0,
+      //       date_time: DateTime.now(),
+      //       category: "Housing",
+      //       type: TransactionType.expense,
+      //       description: 'Test Split Transaction',
+      //       // add other required fields
+      //     );
+      //     return TransactionSplitPage(
+      //       transactionId: dummyTransaction.id!,
+      //       transaction: dummyTransaction,
+      //       currencySymbol: '\$',
+      //     );
+      //   },
+      // ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainPage(navigationShell: navigationShell);

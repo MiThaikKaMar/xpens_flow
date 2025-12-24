@@ -4,6 +4,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:go_router/go_router.dart';
+import 'package:xpens_flow/app/router/routes.dart';
+
 import 'package:xpens_flow/core/common/utils/icon_helper.dart';
 import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
@@ -503,8 +506,36 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
               children: [
                 Text("SPLIT TRANSACTION"),
                 splits != null && splits!.isNotEmpty
-                    ? TextButton(onPressed: () {}, child: Text("Edit Split"))
-                    : TextButton(onPressed: () {}, child: Text("Add Split")),
+                    ? TextButton(
+                        onPressed: () {
+                          context.push(
+                            Routes.transactionSplit.replaceAll(
+                              ':id',
+                              transaction.id.toString(),
+                            ),
+                            extra: {
+                              'transaction': transaction,
+                              'symbol': widget.currencySymbol,
+                            },
+                          );
+                        },
+                        child: Text("Edit Split"),
+                      )
+                    : TextButton(
+                        onPressed: () {
+                          context.push(
+                            Routes.transactionSplit.replaceAll(
+                              ':id',
+                              transaction.id.toString(),
+                            ),
+                            extra: {
+                              'transaction': transaction,
+                              'symbol': widget.currencySymbol,
+                            },
+                          );
+                        },
+                        child: Text("Add Split"),
+                      ),
               ],
             ),
 

@@ -15,6 +15,38 @@ class TransactionSplitCubit extends Cubit<TransactionSplitState> {
     : _getAllCategories = getAllCategories,
       super(TransactionSplitInitial());
 
+  // In your TransactionSplitCubit
+  void loadCategoriesAndInitialize(double totalAmount, {int maxSplits = 10}) {
+    emit(CategoriesLoading());
+
+    try {
+      final categoriesResult = _getAllCategories(NoParams());
+      categoriesResult.fold(
+        (failure) {
+          emit(CategoriesError(message: failure.message));
+        },
+        (categories) {
+          // Store categories in the cubit
+          _allCategories = categories;
+
+          // Emit the split management state directly
+          emit(
+            SplitManagementState(
+              totalAmount: totalAmount,
+              maxSplits: maxSplits,
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      emit(CategoriesError(message: e.toString()));
+    }
+  }
+
+  // Add a property to store categories in your cubit
+  List<CategoryModel>? _allCategories;
+  List<CategoryModel>? get allCategories => _allCategories;
+
   // Initialize split management
   void initializeSplitManagement(double totalAmount, {int maxSplits = 10}) {
     emit(SplitManagementState(totalAmount: totalAmount, maxSplits: maxSplits));
