@@ -29,7 +29,8 @@ Xpens Flow is a local-first expense tracker built with Flutter. It works complet
 - **Database:** sqflite, Hive, Shared Preferences  
 - **State Management:** Bloc / Cubit
 - **Architecture:** Feature-based clean architecture  
-- **Dependency Injection:** get_it  
+- **Dependency Injection:** get_it
+- **Navigation:** go_router 
 - **UI:** Material 3 (dark mode supported)  
 
 ---
