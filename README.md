@@ -1,16 +1,42 @@
-# xpens_flow
+# Xpens Flow
 
-Your flow, your control.
+**Your Flow, Your Control.**
+
+---
+
+## Overview
+Xpens Flow is a local-first expense tracker built with Flutter. It works completely offline, no cloud and no bank connections. You can record transactions, set budgets, and export your data when needed.
+
+---
+
+## Features
+- Works fully offline  
+- Add, edit, and delete transactions  
+- Split a transaction into multiple categories  
+- Monthly budgets with progress tracking  
+- Daily and monthly summaries  
+- Rule-based categorization  
+- Categories and tags for organization  
+- Search and filters  
+- Data export (CSV)  
+- Manual backup and restore  
+- Dark mode  
+
+---
+
+## Tech Stack
+- **Framework:** Flutter (Dart)  
+- **Database:** sqflite, Hive, Shared Preferences  
+- **State Management:** Bloc / Cubit
+- **Architecture:** Feature-based clean architecture  
+- **Dependency Injection:** get_it  
+- **UI:** Material 3 (dark mode supported)  
+
+---
 
 ## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+git clone https://github.com/MiThaikKaMar/xpens_flow.git
+cd xpens_flow
+flutter pub get
+flutter run
