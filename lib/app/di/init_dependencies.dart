@@ -25,7 +25,9 @@ import 'package:xpens_flow/features/transactions/data/repositories/transaction_r
 import 'package:xpens_flow/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/add_transaction.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/list_transactions.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/split/transaction_split_cubit.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -100,6 +102,20 @@ void _transaction() {
       getCurrentCurrency: serviceLocator<GetCurrentCurrency>(),
     ),
   );
+
+  serviceLocator.registerLazySingleton<TransactionEditorBloc>(
+    () => TransactionEditorBloc(
+      getAllCategories: serviceLocator<GetSelectedCategories>(),
+    ),
+  );
+
+  // Cubit
+  serviceLocator.registerLazySingleton<TransactionSplitCubit>(
+    () => TransactionSplitCubit(
+      getAllCategories: serviceLocator<GetSelectedCategories>(),
+    ),
+  );
+  // final cubit = serviceLocator<TransactionSplitCubit>(param1: 150.0);
 }
 
 void _coreAppSettings() {

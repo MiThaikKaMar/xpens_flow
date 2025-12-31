@@ -14,8 +14,13 @@ import 'package:xpens_flow/features/onboarding/presentation/pages/categories_sug
 import 'package:xpens_flow/features/onboarding/presentation/pages/first_run_setup_page.dart';
 import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
+import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
+import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_detail_page.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transaction_editor_page.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transactions_feed_page.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
 
 import '../../core/common/utils/app_strings.dart';
 import '../../features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
@@ -34,7 +39,7 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 class AppRouter {
   final GoRouter router = GoRouter(
     initialLocation: Routes.welcome,
-    //initialLocation: Routes.transactionDetail,
+    //initialLocation: '/test/split',
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();
@@ -86,9 +91,75 @@ class AppRouter {
             .transactionDetail, // relative to /transactions => /transactions/:id
         builder: (BuildContext context, GoRouterState state) {
           final id = state.pathParameters['id']!;
-          return TransactionDetailPage(transactionId: int.parse(id));
+          final extras = state.extra as Map<String, dynamic>;
+          final transaction = extras['transaction'] as Transaction;
+          final currencySymbol = extras['symbol'] as String;
+          return TransactionDetailPage(
+            transactionId: int.parse(id),
+            transaction: transaction,
+            currencySymbol: currencySymbol,
+          );
         },
       ),
+      GoRoute(
+        path: Routes.transactionEdit,
+        builder: (context, state) {
+          final idString = state.pathParameters['id']!;
+          final transactionId = int.parse(idString);
+          final extras = state.extra as Map<String, dynamic>;
+          final transaction = extras['transaction'] as Transaction;
+          final currencySymbol = extras['symbol'] as String;
+          return TransactionEditorPage(
+            transactionId: transactionId,
+            transaction: transaction,
+            currencySymbol: currencySymbol,
+            transactionEditorBloc: serviceLocator<TransactionEditorBloc>(),
+          );
+        },
+      ),
+      GoRoute(
+        path: Routes.transactionSplit,
+        builder: (context, state) {
+          final idString = state.pathParameters['id']!;
+          final transactionId = int.parse(idString);
+          final extras = state.extra as Map<String, dynamic>;
+          final transaction = extras['transaction'] as Transaction;
+          final currencySymbol = extras['symbol'] as String;
+
+          //Use List.from to prevent cast errors if it comes back as List<dynamci>
+          final rawSplits = extras['existingSplits'];
+          final existingSplits = rawSplits != null
+              ? List<TransactionSplit>.from(rawSplits)
+              : <TransactionSplit>[];
+          return TransactionSplitPage(
+            transactionId: transactionId,
+            transaction: transaction,
+            currencySymbol: currencySymbol,
+            existingSplits: existingSplits,
+          );
+        },
+      ),
+
+      // For Ui wareframe preparing
+      // GoRoute(
+      //   path: '/test/split',
+      //   builder: (context, state) {
+      //     final dummyTransaction = Transaction(
+      //       id: 123,
+      //       amount: 5400.0,
+      //       date_time: DateTime.now(),
+      //       category: "Housing",
+      //       type: TransactionType.expense,
+      //       description: 'Test Split Transaction',
+      //       // add other required fields
+      //     );
+      //     return TransactionSplitPage(
+      //       transactionId: dummyTransaction.id!,
+      //       transaction: dummyTransaction,
+      //       currencySymbol: '\$',
+      //     );
+      //   },
+      // ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainPage(navigationShell: navigationShell);

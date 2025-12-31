@@ -8,11 +8,9 @@ import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
 import 'package:xpens_flow/core/ui/theme/app_theme.dart';
 import 'package:xpens_flow/core/ui/theme/typography.dart';
-import 'package:xpens_flow/features/transactions/data/models/transaction_model.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
-import '../../../../core/common/utils/show_snackbar.dart';
 import '../../../../core/ui/bloc/app_settings_bloc.dart';
 import '../../../../core/ui/theme/colors.dart';
 import '../../../../core/ui/theme/spacing.dart';
@@ -100,12 +98,13 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
     final noteText = noteEditingController.text.trim();
     debugPrint("NoteText: $noteText");
 
-    final newTransaction = TransactionModel(
+    final newTransaction = Transaction(
       amount: amount,
       category: _selectedCategory,
       type: _selectedTransactionType,
       merchant_note: noteText.isNotEmpty ? noteText : null,
       date_time: displayDateTime,
+      createdAt: displayDateTime,
     );
 
     _transactionFeedBloc.add(TransactionFeedAdd(transaction: newTransaction));
@@ -411,3 +410,74 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
     //  );
   }
 }
+
+
+/// Quick Add Enhancement
+/// // Update your Quick Add to optionally capture more data
+// class QuickAddTransaction extends StatefulWidget {
+//   // ... existing code
+// }
+
+// class _QuickAddTransactionState extends State<QuickAddTransaction> {
+//   // Existing fields
+//   double? amount;
+//   String? category;
+//   TransactionType? type;
+  
+//   // NEW: Optional fields (can be added later in Edit)
+//   String? selectedAccount;
+//   String? merchant;
+//   bool showAdvancedFields = false; // Toggle for advanced input
+  
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         // Existing quick add fields...
+        
+//         // Optional: "More Details" button
+//         TextButton(
+//           onPressed: () {
+//             setState(() => showAdvancedFields = !showAdvancedFields);
+//           },
+//           child: Text(showAdvancedFields ? "Less Details" : "More Details"),
+//         ),
+        
+//         if (showAdvancedFields) ...[
+//           // Account dropdown
+//           DropdownButton<String>(
+//             value: selectedAccount,
+//             hint: Text("Select Account"),
+//             items: accounts.map((acc) => 
+//               DropdownMenuItem(value: acc, child: Text(acc))
+//             ).toList(),
+//             onChanged: (val) => setState(() => selectedAccount = val),
+//           ),
+          
+//           // Merchant field
+//           TextField(
+//             decoration: InputDecoration(labelText: "Merchant"),
+//             onChanged: (val) => merchant = val,
+//           ),
+//         ],
+        
+//         // Save button creates transaction with available data
+//         ElevatedButton(
+//           onPressed: () {
+//             final transaction = Transaction(
+//               amount: amount!,
+//               category: category!,
+//               type: type!,
+//               date_time: DateTime.now(),
+//               merchant_note: merchant,
+//               account: selectedAccount,
+//               // Other fields will be null and can be edited later
+//             );
+//             // Save transaction
+//           },
+//           child: Text("Save"),
+//         ),
+//       ],
+//     );
+//   }
+// }

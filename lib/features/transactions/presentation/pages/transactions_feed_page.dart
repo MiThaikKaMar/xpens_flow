@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
-import 'package:xpens_flow/core/ui/theme/app_theme.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/widgets/month_header_item.dart';
@@ -41,9 +40,9 @@ class _TransactionsFeedPageState extends State<TransactionsFeedPage> {
         ); // Add this line
 
         if (state is TransactionFeedInitial) {
-          return const Text("Loading transactions");
+          return Center(child: const Text("Loading transactions"));
         } else if (state is TransactionFeedLoading) {
-          return const CircularProgressIndicator();
+          return Center(child: const CircularProgressIndicator());
         } else if (state is TransactionFeedLoaded) {
           if (state.transactionList.isEmpty) {
             return Center(
