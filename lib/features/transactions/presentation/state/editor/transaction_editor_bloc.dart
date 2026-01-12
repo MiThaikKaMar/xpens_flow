@@ -17,7 +17,13 @@ class TransactionEditorBloc
     : _getAllCategories = getAllCategories,
       super(TransactionEditorInitial()) {
     on<LoadAllCategories>(_onLoadCategories);
+    on<TransactionSubmit>(_onTransactionSubmit);
   }
+
+  _onTransactionSubmit(
+    TransactionSubmit event,
+    Emitter<TransactionEditorState> emit,
+  ) async {}
 
   _onLoadCategories(
     LoadAllCategories event,
