@@ -2,14 +2,14 @@
 
 class TransactionSplit {
   final String id;
-  final int? transactionId; //Foreign key to parent transaction
+  final int transactionId; //Foreign key to parent transaction
   final String category;
   final double amount;
   final String? note;
 
   TransactionSplit({
     required this.id,
-    this.transactionId,
+    required this.transactionId,
     required this.category,
     required this.amount,
     this.note,

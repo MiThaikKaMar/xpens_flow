@@ -45,7 +45,7 @@ class TransactionQueries {
     //Load splits for each transaction
     final transactions = <TransactionModel>[];
     for (var map in maps) {
-      final transactionId = map[TransactionTable.columnId] as int;
+      final transactionId = map[TransactionTable.columnId];
       final splits = await splitQueries.getByTransactionId(transactionId);
       transactions.add(TransactionModel.fromMap(map, splits: splits));
     }
@@ -110,7 +110,7 @@ class TransactionQueries {
 
     final transactions = <TransactionModel>[];
     for (var map in maps) {
-      final transactionId = map[TransactionTable.columnId] as int;
+      final transactionId = map[TransactionTable.columnId];
       final splits = await splitQueries.getByTransactionId(transactionId);
       transactions.add(TransactionModel.fromMap(map, splits: splits));
     }
@@ -135,7 +135,7 @@ class TransactionQueries {
 
     final transactions = <TransactionModel>[];
     for (var map in maps) {
-      final transactionId = map[TransactionTable.columnId] as int;
+      final transactionId = map[TransactionTable.columnId];
       final splits = await splitQueries.getByTransactionId(transactionId);
       transactions.add(TransactionModel.fromMap(map, splits: splits));
     }

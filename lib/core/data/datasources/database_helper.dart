@@ -7,7 +7,8 @@ import 'package:xpens_flow/features/transactions/data/tables/transaction_table.d
 class DatabaseHelper {
   static DatabaseHelper? _instance;
   static Database? _database;
-  final int _databaseVersion = 3;
+  // final int _databaseVersion = 3;
+  final int _databaseVersion = 5; // add split table
 
   DatabaseHelper._();
 
@@ -97,6 +98,12 @@ WHERE ${TransactionTable.columnCreatedAt} IS NULL
 ''');
 
       debugPrint('Migration to version 3 complete.');
+    }
+
+    if (oldVersion < 4) {
+      debugPrint('Recreating transaction_splits table (empty table)');
+      await db.execute(TransactionSplitTable.dropTableSQL);
+      await db.execute(TransactionSplitTable.createTableSQL);
     }
 
     debugPrint('Database upgrade complete.');

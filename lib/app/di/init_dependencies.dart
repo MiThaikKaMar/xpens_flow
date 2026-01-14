@@ -106,6 +106,7 @@ void _transaction() {
   serviceLocator.registerLazySingleton<TransactionEditorBloc>(
     () => TransactionEditorBloc(
       getAllCategories: serviceLocator<GetSelectedCategories>(),
+      addTransaction: serviceLocator<AddTransaction>(),
     ),
   );
 

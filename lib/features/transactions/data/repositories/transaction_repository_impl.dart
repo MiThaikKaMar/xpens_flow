@@ -67,9 +67,11 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<Either<Failure, List<Transaction>>> getAllTransactions() async {
     try {
+      debugPrint("1 ONE");
       final transactionModels = await localDataSource.getAllTransactions();
       debugPrint(transactionModels.toString());
       // Models extend entities, so they can be returned directly
+
       return Right(transactionModels);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.toString()));

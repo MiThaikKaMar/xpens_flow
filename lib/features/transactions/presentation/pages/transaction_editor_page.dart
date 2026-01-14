@@ -111,6 +111,9 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
 ${transaction.splits}, ${transaction.createdAt}, ${transaction.updatedAt}
 
     ''');
+    widget._transactionEditorBloc.add(
+      TransactionSubmit(transaction: transaction),
+    );
   }
 
   void _handleAddTag(String tag, BuildContext dialogContext) {
