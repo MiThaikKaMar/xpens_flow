@@ -12,7 +12,6 @@ import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
-import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/widgets/attachment_card.dart';
 
@@ -122,7 +121,7 @@ ${transaction.splits}, ${transaction.createdAt}, ${transaction.updatedAt}
       widget._transactionEditorBloc.add(
         TransactionSubmit(transaction: transaction),
       );
-      context.pop();
+      context.pop(transaction);
     } else {
       showDialog(
         context: context,
@@ -249,8 +248,13 @@ for (final split in splits) {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text("Edit Transaction"),
-        actions: [Icon(Icons.delete_outline)],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -564,6 +568,7 @@ for (final split in splits) {
                   ...attachments!.map((entry) {
                     return AttachmentCard(
                       imageUrl: entry,
+                      isDeletable: true,
                       onDelete: () {
                         _handleRemoveAttachment(entry);
                       },

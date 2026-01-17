@@ -97,6 +97,7 @@ class TransactionQueries {
       where: '${TransactionTable.columnId} =?',
       whereArgs: [id],
     );
+    // return deletedCount
   }
 
   //Get transactions by category

@@ -1,10 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/router/routes.dart';
 import 'package:xpens_flow/core/common/utils/icon_helper.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/action/transaction_action_cubit.dart';
+import 'package:xpens_flow/features/transactions/presentation/widgets/attachment_card.dart';
 
 import '../../../../core/ui/theme/colors.dart';
 import '../../../../core/ui/theme/spacing.dart';
@@ -30,25 +33,56 @@ class TransactionDetailPage extends StatefulWidget {
 class _TransactionDetailPageState extends State<TransactionDetailPage> {
   late String _amountText;
   late bool _isExpense;
+  late Transaction transaction;
 
   @override
   void initState() {
     super.initState();
+    transaction = widget.transaction;
     _isExpense = widget.transaction.type == TransactionType.expense;
+  }
+
+  void _deleteTransaction() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text("Delete Transaction?"),
+          content: const Text(
+            "This action cannot be undone. \n Are you sure you want to delete this transaction?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<TransactionActionCubit>().delete(transaction.id!);
+                Navigator.pop(dialogContext);
+                context.pop();
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    Transaction transaction = widget.transaction;
-
     _amountText = _isExpense
         ? "-${widget.currencySymbol}${transaction.amount}"
         : "+${widget.currencySymbol}${transaction.amount}";
 
     String categoryText = transaction.category;
     String merchantNote = transaction.merchant_note ?? '';
-    TransactionType type = transaction.type;
-    DateTime dateTime = transaction.date_time;
+    // TransactionType type = transaction.type;
+    // DateTime dateTime = transaction.date_time;
     String? account = transaction.account;
     String? description = transaction.description;
     List<String>? tags = transaction.tags;
@@ -73,16 +107,24 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ),
             child: IconButton(
               onPressed: () {
-                context.push(
-                  Routes.transactionEdit.replaceAll(
-                    ':id',
-                    widget.transactionId.toString(),
-                  ),
-                  extra: {
-                    'transaction': transaction,
-                    'symbol': widget.currencySymbol,
-                  },
-                );
+                context
+                    .push(
+                      Routes.transactionEdit.replaceAll(
+                        ':id',
+                        widget.transactionId.toString(),
+                      ),
+                      extra: {
+                        'transaction': transaction,
+                        'symbol': widget.currencySymbol,
+                      },
+                    )
+                    .then((result) {
+                      if (result != null) {
+                        setState(() {
+                          transaction = result as Transaction;
+                        });
+                      }
+                    });
               },
               icon: Icon(
                 Icons.edit,
@@ -104,7 +146,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               borderRadius: BorderRadius.circular(AppSpacing.sm),
             ),
             child: IconButton(
-              onPressed: () {},
+              onPressed: _deleteTransaction,
               icon: Icon(
                 Icons.delete,
                 size: AppSpacing.size18,
@@ -150,10 +192,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             Visibility(
               visible: description != null,
               child: Column(
-                children: [
-                  Text("DESCRIPTION"),
-                  Text("Monthly rent payment - January 2024"),
-                ],
+                children: [Text("DESCRIPTION"), Text(description ?? '')],
               ),
             ),
 
@@ -166,7 +205,17 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               child: Column(
                 children: [
                   Text("TAGS"),
-                  ChoiceChip(label: Text("Essential"), selected: true),
+                  Row(
+                    children: tags == null
+                        ? []
+                        : tags.asMap().entries.map((tag) {
+                            return ChoiceChip(
+                              label: Text(tag.value),
+                              selected: true,
+                            );
+                          }).toList(),
+                  ),
+
                   Divider(),
                 ],
               ),
@@ -180,11 +229,19 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               child: Column(
                 children: [
                   Text("ATTACHMENTS"),
-                  Container(
-                    color: AppColors.darkBlueBgLight,
-                    width: AppSpacing.size100,
-                    height: AppSpacing.size100,
+                  Row(
+                    children: attachments == null
+                        ? []
+                        : attachments.map((attachment) {
+                            return AttachmentCard(
+                              imageUrl: attachment,
+                              isDeletable: false,
+                              onDelete: () {},
+                              onTap: () {},
+                            );
+                          }).toList(),
                   ),
+
                   Divider(),
                 ],
               ),
@@ -197,16 +254,20 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
               child: Column(
                 children: [
                   Text("SPLIT DETAILS"),
-                  ListTile(
-                    leading: Icon(Icons.house),
-                    title: Text("Rent"),
-                    trailing: Text("-\$2,500.00"),
+                  Column(
+                    children: splits == null
+                        ? []
+                        : splits.map((item) {
+                            return ListTile(
+                              leading: Icon(
+                                getIconDataFromString(item.category),
+                              ),
+                              title: Text(item.category),
+                              trailing: Text(item.amount.toString()),
+                            );
+                          }).toList(),
                   ),
-                  ListTile(
-                    leading: Icon(Icons.bolt),
-                    title: Text("Utilities"),
-                    trailing: Text("-\$347.50"),
-                  ),
+
                   Divider(),
                 ],
               ),
@@ -236,9 +297,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             //................................
             //Audit
             Text("AUDIT TRAIL"),
-            Text(
-              "Created: ${formatFullDateTime(widget.transaction.date_time)}",
-            ),
+            Text("Created: ${formatFullDateTime(createdAt!)}"),
             Visibility(
               visible: updatedAt != null,
               child: Text("Updated: ${formatFullDateTime(updatedAt!)}"),

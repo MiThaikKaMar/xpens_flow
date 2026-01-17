@@ -6,12 +6,14 @@ import '../../../../core/ui/theme/spacing.dart';
 
 class AttachmentCard extends StatefulWidget {
   final String imageUrl;
+  final bool isDeletable;
   final VoidCallback onDelete;
   final VoidCallback onTap;
 
   const AttachmentCard({
     super.key,
     required this.imageUrl,
+    required this.isDeletable,
     required this.onDelete,
     required this.onTap,
   });
@@ -47,12 +49,15 @@ class _AttachmentCardState extends State<AttachmentCard> {
           ),
 
           // Delete Button
-          Positioned(
-            top: 4,
-            right: 4,
-            child: IconButton.filled(
-              onPressed: widget.onDelete,
-              icon: Icon(Icons.close),
+          Visibility(
+            visible: widget.isDeletable,
+            child: Positioned(
+              top: 4,
+              right: 4,
+              child: IconButton.filled(
+                onPressed: widget.onDelete,
+                icon: Icon(Icons.close),
+              ),
             ),
           ),
         ],

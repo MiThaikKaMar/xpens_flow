@@ -11,7 +11,7 @@ abstract interface class TransactionRepository {
 
   Future<Either<Failure, void>> updateTransaction(Transaction transaction);
 
-  Future<Either<Failure, void>> deleteTransaction(int id);
+  Future<Either<Failure, int>> deleteTransaction(int id);
 
   Future<Either<Failure, List<Transaction>>> getTransactionsByDateRange(
     DateTime startDate,

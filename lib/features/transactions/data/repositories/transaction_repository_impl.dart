@@ -49,10 +49,10 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteTransaction(int id) async {
+  Future<Either<Failure, int>> deleteTransaction(int id) async {
     try {
-      await localDataSource.deleteTransaction(id);
-      return const Right(null);
+      int deletedCount = await localDataSource.deleteTransaction(id);
+      return Right(deletedCount);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
     } catch (e) {

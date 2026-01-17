@@ -24,7 +24,9 @@ import 'package:xpens_flow/features/transactions/data/datasources/transaction_lo
 import 'package:xpens_flow/features/transactions/data/repositories/transaction_repository_impl.dart';
 import 'package:xpens_flow/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/add_transaction.dart';
+import 'package:xpens_flow/features/transactions/domain/usecases/delete_transaction.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/list_transactions.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/action/transaction_action_cubit.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/split/transaction_split_cubit.dart';
@@ -94,6 +96,12 @@ void _transaction() {
     ),
   );
 
+  serviceLocator.registerFactory(
+    () => DeleteTransaction(
+      transactionRepository: serviceLocator<TransactionRepository>(),
+    ),
+  );
+
   //bloc
   serviceLocator.registerLazySingleton<TransactionFeedBloc>(
     () => TransactionFeedBloc(
@@ -117,6 +125,12 @@ void _transaction() {
     ),
   );
   // final cubit = serviceLocator<TransactionSplitCubit>(param1: 150.0);
+
+  serviceLocator.registerLazySingleton<TransactionActionCubit>(
+    () => TransactionActionCubit(
+      deleteTransaction: serviceLocator<DeleteTransaction>(),
+    ),
+  );
 }
 
 void _coreAppSettings() {

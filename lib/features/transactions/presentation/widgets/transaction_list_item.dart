@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'package:xpens_flow/core/ui/theme/typography.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
 import '../../../../app/router/routes.dart';
 import '../../../../core/ui/format/date_format.dart';
@@ -47,18 +49,23 @@ class _TransactionListItemState extends State<TransactionListItem> {
 
     return GestureDetector(
       onTap: () {
+        final feedBloc = context.read<TransactionFeedBloc>();
         debugPrint("Transaction Detailed Id: ${widget.transaction.id}");
-        context.push(
-          //'/transactions/123',
-          Routes.transactionDetail.replaceAll(
-            ':id',
-            widget.transaction.id.toString(),
-          ),
-          extra: {
-            'transaction': widget.transaction,
-            'symbol': widget.currencySymbol,
-          },
-        );
+        context
+            .push(
+              //'/transactions/123',
+              Routes.transactionDetail.replaceAll(
+                ':id',
+                widget.transaction.id.toString(),
+              ),
+              extra: {
+                'transaction': widget.transaction,
+                'symbol': widget.currencySymbol,
+              },
+            )
+            .then((result) {
+              feedBloc.add(TransactionFeedShowAll());
+            });
       },
       child: Container(
         decoration: BoxDecoration(
