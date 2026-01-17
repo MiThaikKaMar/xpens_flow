@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/di/init_dependencies.dart';
@@ -123,6 +125,7 @@ class AppRouter {
           final idString = state.pathParameters['id']!;
           final transactionId = int.parse(idString);
           final extras = state.extra as Map<String, dynamic>;
+          final editedAmount = extras['editedAmount'] as double;
           final transaction = extras['transaction'] as Transaction;
           final currencySymbol = extras['symbol'] as String;
 
@@ -132,6 +135,7 @@ class AppRouter {
               ? List<TransactionSplit>.from(rawSplits)
               : <TransactionSplit>[];
           return TransactionSplitPage(
+            editedAmount: editedAmount,
             transactionId: transactionId,
             transaction: transaction,
             currencySymbol: currencySymbol,

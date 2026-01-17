@@ -9,6 +9,7 @@ import '../../../../core/ui/theme/spacing.dart';
 import '../../domain/entities/transaction.dart';
 
 class TransactionSplitPage extends StatefulWidget {
+  final double editedAmount;
   final int transactionId;
   final Transaction transaction;
   final String currencySymbol;
@@ -16,6 +17,7 @@ class TransactionSplitPage extends StatefulWidget {
 
   const TransactionSplitPage({
     super.key,
+    required this.editedAmount,
     required this.transactionId,
     required this.transaction,
     required this.currencySymbol,
@@ -53,7 +55,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     debugPrint("Existing Splits : ${widget.existingSplits?.length}");
     // Initialize everything at once
     context.read<TransactionSplitCubit>().loadCategoriesAndInitialize(
-      transaction.amount,
+      widget.editedAmount, //transaction.amount,
       initialSplits: widget.existingSplits,
     );
     //Initialize split management and load categories
@@ -85,6 +87,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     //Get categories from the cubit directly
     final cubit = context.read<TransactionSplitCubit>();
     final allCategories = cubit.allCategories;
+    final remainOrOverAmount = state.remainingToAllocate;
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -98,7 +101,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
                 title: Text(transaction.category),
                 subtitle: Text(formatFullDateTime(transaction.date_time)),
               ),
-              Text("$currencySymbol${transaction.amount}"),
+              Text("$currencySymbol${widget.editedAmount.toStringAsFixed(2)}"),
               Text("Total to split"),
             ],
           ),
@@ -107,9 +110,11 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
           //...........................
           // Remaining to allocate
           ListTile(
-            title: Text("Remaining to allocate"),
+            title: Text(
+              remainOrOverAmount > 0 ? "Remaining to allocate" : "Over by",
+            ),
             subtitle: Text(
-              "$currencySymbol${state.remainingToAllocate.toStringAsFixed(2)}",
+              "$currencySymbol${remainOrOverAmount.toStringAsFixed(2)}",
             ),
             // trailing: IconButton.filled(
             //   onPressed: () {

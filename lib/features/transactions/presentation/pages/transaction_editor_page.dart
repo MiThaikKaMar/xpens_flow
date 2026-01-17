@@ -12,6 +12,7 @@ import 'package:xpens_flow/core/data/models/category_model.dart';
 import 'package:xpens_flow/core/ui/theme/colors.dart';
 import 'package:xpens_flow/core/ui/theme/spacing.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
 import 'package:xpens_flow/features/transactions/presentation/widgets/attachment_card.dart';
 
@@ -111,8 +112,68 @@ ${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments
 ${transaction.splits}, ${transaction.createdAt}, ${transaction.updatedAt}
 
     ''');
-    widget._transactionEditorBloc.add(
-      TransactionSubmit(transaction: transaction),
+
+    final (isValid, splitTotal) = areSplitsValid(
+      transaction.amount,
+      transaction.splits,
+    );
+
+    if (isValid) {
+      widget._transactionEditorBloc.add(
+        TransactionSubmit(transaction: transaction),
+      );
+      context.pop();
+    } else {
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: Text("Split amounts don't match"),
+            content: Text(
+              "Transaction amount is ${transaction.amount.toStringAsFixed(2)},\n splits total ${splitTotal.toStringAsFixed(2)}",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                },
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _handleSplitActions();
+                },
+                child: Text("Review Splits"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  (bool, double) areSplitsValid(double amount, List<TransactionSplit>? splits) {
+    if (splits == null || splits.isEmpty) return (true, 0.0);
+
+    final splitTotal = splits.fold<double>(0.0, (sum, s) => sum + s.amount);
+    /*
+    double splitTotal = 0.0;
+
+for (final split in splits) {
+  splitTotal += split.amount;
+}
+ */
+
+    return (splitTotal == amount, splitTotal);
+  }
+
+  double _getEditedAmount() {
+    return double.parse(
+      _amountController.text.replaceAll(
+        RegExp(RegExp.escape(widget.currencySymbol)),
+        '',
+      ),
     );
   }
 
@@ -159,11 +220,14 @@ ${transaction.splits}, ${transaction.createdAt}, ${transaction.updatedAt}
   }
 
   void _handleSplitActions() {
+    final editedAmount = _getEditedAmount();
+
     debugPrint("splits in editor: ${splits?.length}");
     context
         .push<List<TransactionSplit>>(
           Routes.transactionSplit.replaceAll(':id', transaction.id.toString()),
           extra: {
+            'editedAmount': editedAmount,
             'transaction': transaction,
             'symbol': widget.currencySymbol,
             'existingSplits': splits,
