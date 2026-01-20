@@ -80,3 +80,5 @@ class Transaction {
 // }
 
 enum TransactionType { income, expense, transfer }
+
+enum Accounts { mainChecking, cash, creditCard, wallet }

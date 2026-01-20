@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../features/transactions/domain/entities/transaction.dart';
+
 IconData getIconDataFromString(String iconName) {
   switch (iconName) {
     case 'Housing':
@@ -28,5 +30,18 @@ IconData getIconDataFromString(String iconName) {
       return Icons.attach_money;
     default:
       return Icons.category;
+  }
+}
+
+IconData getIconDataFromAccountText(Accounts accountText) {
+  switch (accountText) {
+    case Accounts.mainChecking:
+      return Icons.account_balance;
+    case Accounts.cash:
+      return Icons.payments;
+    case Accounts.creditCard:
+      return Icons.credit_card;
+    case Accounts.wallet:
+      return Icons.account_balance_wallet;
   }
 }

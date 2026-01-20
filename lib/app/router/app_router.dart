@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xpens_flow/app/di/init_dependencies.dart';
@@ -18,6 +16,7 @@ import 'package:xpens_flow/features/onboarding/presentation/pages/welcome_page.d
 import 'package:xpens_flow/features/settings/presentation/pages/more_page.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
+import 'package:xpens_flow/features/transactions/presentation/pages/transaction_add_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_detail_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_editor_page.dart';
 import 'package:xpens_flow/features/transactions/presentation/pages/transaction_split_page.dart';
@@ -40,8 +39,8 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
-    initialLocation: Routes.welcome,
-    //initialLocation: '/test/split',
+    //initialLocation: Routes.welcome,
+    initialLocation: Routes.transactionAdd,
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();
@@ -87,6 +86,12 @@ class AppRouter {
         builder: (context, state) => CategoriesSuggestPage(
           categoryCubit: serviceLocator<CategoryCubit>(),
         ),
+      ),
+      GoRoute(
+        path: Routes.transactionAdd,
+        builder: (context, state) {
+          return TransactionAddPage();
+        },
       ),
       GoRoute(
         path: Routes
