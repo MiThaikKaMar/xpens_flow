@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xpens_flow/core/data/models/category_model.dart';
+import 'package:xpens_flow/core/domain/usecases/get_current_currency.dart';
 import 'package:xpens_flow/core/domain/usecases/get_selected_categories.dart';
 import 'package:xpens_flow/core/domain/usecases/usecase.dart';
 import 'package:xpens_flow/features/transactions/domain/usecases/add_transaction.dart';
@@ -14,14 +15,33 @@ part 'transaction_editor_state.dart';
 class TransactionEditorBloc
     extends Bloc<TransactionEditorEvent, TransactionEditorState> {
   final GetSelectedCategories _getAllCategories;
+  final GetCurrentCurrency _getCurrentCurrency;
   final AddTransaction _addTransaction;
 
-  TransactionEditorBloc({required getAllCategories, required addTransaction})
-    : _getAllCategories = getAllCategories,
-      _addTransaction = addTransaction,
-      super(TransactionEditorInitial()) {
+  TransactionEditorBloc({
+    required getAllCategories,
+    required addTransaction,
+    required getCurrentCurrency,
+  }) : _getAllCategories = getAllCategories,
+       _addTransaction = addTransaction,
+       _getCurrentCurrency = getCurrentCurrency,
+       super(TransactionEditorInitial()) {
     on<LoadAllCategories>(_onLoadCategories);
     on<TransactionSubmit>(_onTransactionSubmit);
+    on<LoadCurrency>(_onLoadCurrency);
+  }
+
+  _onLoadCurrency(
+    LoadCurrency event,
+    Emitter<TransactionEditorState> emit,
+  ) async {
+    emit(CurrencyLoading());
+
+    final currencyResult = _getCurrentCurrency.call(NoParams());
+    currencyResult.fold(
+      (error) => emit(CurrencyError(message: error.message)),
+      (currency) => emit(CurrencyLoaded(currency: currency)),
+    );
   }
 
   _onTransactionSubmit(

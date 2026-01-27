@@ -44,7 +44,7 @@ class _TransactionSplitPageState extends State<TransactionSplitPage> {
     super.initState();
 
     transaction = widget.transaction;
-    transactionId = transaction.id!;
+    transactionId = widget.transactionId;
     currencySymbol = widget.currencySymbol;
 
     newSplitCategory = 'Select category';

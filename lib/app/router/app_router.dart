@@ -39,8 +39,8 @@ final GlobalKey<NavigatorState> _moreNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   final GoRouter router = GoRouter(
-    //initialLocation: Routes.welcome,
-    initialLocation: Routes.transactionAdd,
+    initialLocation: Routes.welcome,
+    //initialLocation: Routes.transactionAdd,
     redirect: (BuildContext context, GoRouterState state) {
       // Check SharedPreferences directly
       final prefsHelper = serviceLocator<SharedPreferencesHelper>();
@@ -90,7 +90,10 @@ class AppRouter {
       GoRoute(
         path: Routes.transactionAdd,
         builder: (context, state) {
-          return TransactionAddPage();
+          return TransactionAddPage(
+            transactionEditorBloc: serviceLocator<TransactionEditorBloc>(),
+            transactionFeedBloc: serviceLocator<TransactionFeedBloc>(),
+          );
         },
       ),
       GoRoute(

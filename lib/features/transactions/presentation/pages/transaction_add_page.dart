@@ -1,9 +1,16 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:xpens_flow/core/common/utils/icon_helper.dart';
+import 'package:xpens_flow/features/transactions/domain/entities/transaction_split.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/editor/transaction_editor_bloc.dart';
+import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
 
 import '../../../../core/data/models/category_model.dart';
 import '../../../../core/ui/format/date_format.dart';
@@ -11,26 +18,53 @@ import '../../../../core/ui/theme/colors.dart';
 import '../../../../core/ui/theme/spacing.dart';
 import '../../../../core/ui/theme/typography.dart';
 import '../../domain/entities/transaction.dart';
+import '../widgets/attachment_card.dart';
 
 class TransactionAddPage extends StatefulWidget {
-  const TransactionAddPage({super.key});
+  final TransactionEditorBloc _transactionEditorBloc;
+  final TransactionFeedBloc _transactionFeedBloc;
+
+  const TransactionAddPage({
+    super.key,
+    required transactionEditorBloc,
+    required transactionFeedBloc,
+  }) : _transactionFeedBloc = transactionFeedBloc,
+       _transactionEditorBloc = transactionEditorBloc;
 
   @override
   State<TransactionAddPage> createState() => _TransactionAddPageState();
 }
 
 class _TransactionAddPageState extends State<TransactionAddPage> {
-  final TextEditingController amountEditingController = TextEditingController();
-  final TextEditingController noteEditingController = TextEditingController();
+  final TextEditingController _amountEditingController =
+      TextEditingController();
+  final TextEditingController _merchantEditingController =
+      TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  List<String> attachments = [];
+  List<TransactionSplit> splits = [];
+  bool isRecurring = false;
+
+  final ImagePicker picker = ImagePicker();
 
   TransactionType? selectedType = TransactionType.expense;
   String selecedAccount = Accounts.mainChecking.name;
   DateTime displayDateTime = DateTime.now();
   String categoryText = '';
   List<String> tags = [];
+  String currencySymbol = '';
 
   late TextEditingController _addTagEditingController;
+
+  double _getEditedAmount() {
+    return double.parse(
+      _amountEditingController.text.replaceAll(
+        RegExp(RegExp.escape(currencySymbol)),
+        '',
+      ),
+    );
+  }
 
   void _handleAddTag(String tag, BuildContext dialogContext) {
     tags.add(tag);
@@ -39,9 +73,82 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
     });
   }
 
+  void _handleSaveTransaction(Transaction transaction) {
+    debugPrint('''New transaction: ${transaction.id}, ${transaction.amount},
+    ${transaction.type} , ${transaction.category}, ${transaction.account}, ${transaction.merchant_note},
+${transaction.date_time}, ${transaction.description}, ${transaction.tags} , 
+${transaction.isTransfer}, ${transaction.isRecurring}, ${transaction.attachments},
+${transaction.splits}, ${transaction.createdAt}, ${transaction.updatedAt}
+
+    ''');
+
+    if (_getEditedAmount() == 0.0) {
+      //showSnackbar(context, "Amount can not be empty");
+      debugPrint("Amount can not be empty");
+      return;
+    }
+
+    if (categoryText.isEmpty) {
+      //showSnackbar(context, "Please select a category");
+      debugPrint("Please select a category");
+      return;
+    }
+    widget._transactionFeedBloc.add(
+      TransactionFeedAdd(transaction: transaction),
+    );
+
+    context.pop();
+  }
+
+  Future<void> _handleFilePicker() async {
+    String? filePath;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowMultiple: false,
+      allowedExtensions: ['jpg', 'png', 'image/jpeg', 'image/png'],
+    );
+
+    if (result != null) {
+      filePath = result.files.single.path!;
+      debugPrint("FilePath: $filePath");
+
+      setState(() {
+        attachments.add(filePath!);
+      });
+    } else {
+      //User canceled the picker
+    }
+  }
+
+  Future<void> _handlePhotoCapture() async {
+    final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+    String? filePath;
+
+    if (photo != null) {
+      filePath = photo.path;
+      debugPrint("FilePath: $filePath");
+
+      setState(() {
+        attachments.add(filePath!);
+      });
+    } else {
+      //User canceled the picker
+    }
+  }
+
+  void _handleRemoveAttachment(String filePath) {
+    setState(() {
+      attachments.remove(filePath);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+
+    widget._transactionEditorBloc.add(LoadAllCategories());
+    widget._transactionEditorBloc.add(LoadCurrency());
 
     _addTagEditingController = TextEditingController();
   }
@@ -58,10 +165,34 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
               // ............Amount..............
               Text("Amount"),
               SizedBox(height: AppSpacing.sm),
-              Text(
-                "\$",
-                style: TextStyle(fontSize: 38, fontWeight: FontWeight.w100),
+              BlocBuilder<TransactionEditorBloc, TransactionEditorState>(
+                builder: (context, state) {
+                  if (state is CurrencyError) {
+                    return Text(
+                      currencySymbol,
+                      style: TextStyle(
+                        fontSize: 38,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    );
+                  }
+                  if (state is CurrencyLoaded) {
+                    currencySymbol = state.currency;
+                    return Text(
+                      currencySymbol,
+                      style: TextStyle(
+                        fontSize: 38,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    );
+                  }
+                  return Text(
+                    currencySymbol,
+                    style: TextStyle(fontSize: 38, fontWeight: FontWeight.w100),
+                  );
+                },
               ),
+
               TextField(
                 focusNode: _focusNode,
                 style: AppTypography.amountLarge.copyWith(
@@ -90,7 +221,7 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
-                controller: amountEditingController,
+                controller: _amountEditingController,
                 onTap: () {
                   if (!_focusNode.hasFocus) _focusNode.requestFocus();
                 },
@@ -218,13 +349,20 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
               Column(
                 children: [
                   Text("Merchant"),
-                  TextField(),
+                  TextField(controller: _merchantEditingController),
                   Divider(),
                   Text("Suggested"),
                   Row(
-                    children: ["Starbucks ", "KFC "].map((merchant) {
-                      return Text(merchant);
-                    }).toList(),
+                    children: ["Starbucks ", "KFC ", "McDonald’s ", "Uber"].map(
+                      (merchant) {
+                        return GestureDetector(
+                          onTap: () => setState(() {
+                            _merchantEditingController.text = merchant;
+                          }),
+                          child: Text(merchant),
+                        );
+                      },
+                    ).toList(),
                   ),
                 ],
               ),
@@ -233,41 +371,92 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
 
               //............Description.............
               Text("Description"),
-              TextField(),
+              TextField(controller: _descriptionController),
 
               SizedBox(height: AppSpacing.lg),
 
               //.............Category...................
-              PopupMenuButton<CategoryModel>(
-                onSelected: (categoryModel) {
-                  setState(() {
-                    categoryText = categoryModel.label;
-                  });
+              BlocBuilder<TransactionEditorBloc, TransactionEditorState>(
+                buildWhen: (previous, current) {
+                  // only rebuild when categories states change
+                  return current is CategoriesLoaded ||
+                      current is CategoriesLoading ||
+                      current is CategoriesError;
                 },
-                itemBuilder: (context) {
-                  return [
-                    CategoryModel(label: "Hello", iconName: 'Icons.house'),
-                    CategoryModel(label: "Hello2", iconName: 'Icons.house'),
-                  ].map((category) {
-                    return PopupMenuItem(
-                      value: category,
-                      child: Row(
-                        children: [
-                          Icon(category.iconData),
-                          SizedBox(width: AppSpacing.sm),
-                          Text(category.label),
-                        ],
+                builder: (context, state) {
+                  if (state is CategoriesLoading) {
+                    return PopupMenuButton(
+                      enabled: false,
+                      itemBuilder: (context) => [],
+                      child: ListTile(
+                        leading: Icon(getIconDataFromString(categoryText)),
+                        title: Text("Category"),
+                        subtitle: Text("Loading..."),
+                        trailing: Icon(Icons.arrow_drop_down),
                       ),
                     );
-                  }).toList();
-                },
+                  }
 
-                child: ListTile(
-                  leading: Icon(getIconDataFromString(categoryText)),
-                  title: Text("Category"),
-                  subtitle: Text(categoryText),
-                  trailing: Icon(Icons.arrow_drop_down),
-                ),
+                  if (state is CategoriesError) {
+                    return PopupMenuButton(
+                      enabled: false,
+                      itemBuilder: (context) => [],
+                      child: ListTile(
+                        leading: Icon(getIconDataFromString(categoryText)),
+                        title: Text("Category"),
+                        subtitle: Text("Error loading"),
+                        trailing: Icon(Icons.arrow_drop_down),
+                      ),
+                    );
+                  }
+
+                  if (state is CategoriesLoaded) {
+                    final categories = state.categories;
+
+                    return PopupMenuButton<CategoryModel>(
+                      onSelected: (categoryModel) {
+                        setState(() {
+                          categoryText = categoryModel.label;
+                        });
+                      },
+                      itemBuilder: (context) {
+                        return categories.map((category) {
+                          return PopupMenuItem(
+                            value: category,
+                            child: Row(
+                              children: [
+                                Icon(category.iconData),
+                                SizedBox(width: AppSpacing.sm),
+                                Text(category.label),
+                              ],
+                            ),
+                          );
+                        }).toList();
+                      },
+
+                      child: ListTile(
+                        leading: Icon(getIconDataFromString(categoryText)),
+                        title: Text("Category"),
+                        subtitle: Text(
+                          categoryText == '' ? "Select category" : categoryText,
+                        ),
+                        trailing: Icon(Icons.arrow_drop_down),
+                      ),
+                    );
+                  }
+
+                  return PopupMenuButton<CategoryModel>(
+                    enabled: false,
+                    itemBuilder: (context) => [],
+
+                    child: ListTile(
+                      leading: Icon(getIconDataFromString(categoryText)),
+                      title: Text("Category"),
+                      subtitle: Text("Something wrong!"),
+                      trailing: Icon(Icons.arrow_drop_down),
+                    ),
+                  );
+                },
               ),
 
               //............Tags.................
@@ -327,10 +516,41 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
 
               //.............Receipt.................
               Text("Receipt"),
+              Wrap(
+                spacing: AppSpacing.smmd,
+                runSpacing: AppSpacing.smmd,
+                children: [
+                  if (attachments.isNotEmpty)
+                    ...attachments.map((entry) {
+                      return AttachmentCard(
+                        imageUrl: entry,
+                        isDeletable: true,
+                        onDelete: () {
+                          _handleRemoveAttachment(entry);
+                        },
+                        onTap: () {
+                          debugPrint("View Attachment");
+                        },
+                      );
+                    })
+                  else
+                    Text("No attachments yet"),
+                ],
+              ),
               Row(
                 children: [
-                  OutlinedButton(onPressed: () {}, child: Text("Camera")),
-                  OutlinedButton(onPressed: () {}, child: Text("Gallery")),
+                  OutlinedButton(
+                    onPressed: () async {
+                      await _handlePhotoCapture();
+                    },
+                    child: Text("Camera"),
+                  ),
+                  OutlinedButton(
+                    onPressed: () async {
+                      await _handleFilePicker();
+                    },
+                    child: Text("Gallery"),
+                  ),
                 ],
               ),
 
@@ -340,7 +560,14 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
               ListTile(
                 title: Text("Recurring Transaction"),
                 subtitle: Text("Set up automatic entires"),
-                trailing: Switch(value: false, onChanged: (value) {}),
+                trailing: Switch(
+                  value: isRecurring,
+                  onChanged: (value) {
+                    setState(() {
+                      isRecurring = value;
+                    });
+                  },
+                ),
               ),
             ],
           ),
@@ -349,10 +576,46 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ElevatedButton(onPressed: () {}, child: Text("Save Transaction")),
-          TextButton(onPressed: () {}, child: Text("Split Transaction")),
+          ElevatedButton(
+            onPressed: () {
+              _handleSaveTransaction(newTransaction());
+            },
+            child: Text("Save Transaction"),
+          ),
         ],
       ),
     );
+  }
+
+  Transaction newTransaction() {
+    String amount = _amountEditingController.text.trim();
+    String merchantNote = _merchantEditingController.text.trim();
+    String descriptionText = _descriptionController.text.trim();
+    bool isTransfer = TransactionType.transfer == selectedType;
+
+    // //Validations
+    // if (amount == '') return;
+
+    final newTransaction = Transaction(
+      id: null,
+      amount: double.parse(amount),
+      category: categoryText,
+      type: selectedType!,
+      merchant_note: merchantNote,
+      date_time: displayDateTime,
+      account: selecedAccount,
+      description: descriptionText,
+      tags: tags,
+      isTransfer: isTransfer,
+      isRecurring: isRecurring,
+      attachments: attachments,
+      splits: splits,
+      createdAt: displayDateTime,
+      updatedAt: displayDateTime,
+
+      // appliedRule: appliedRule,
+    );
+
+    return newTransaction;
   }
 }

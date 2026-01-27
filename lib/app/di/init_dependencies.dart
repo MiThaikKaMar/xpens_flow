@@ -115,6 +115,7 @@ void _transaction() {
     () => TransactionEditorBloc(
       getAllCategories: serviceLocator<GetSelectedCategories>(),
       addTransaction: serviceLocator<AddTransaction>(),
+      getCurrentCurrency: serviceLocator<GetCurrentCurrency>(),
     ),
   );
 

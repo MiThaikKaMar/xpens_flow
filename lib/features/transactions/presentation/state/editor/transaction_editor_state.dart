@@ -35,3 +35,20 @@ final class TransactionSubmissionError extends TransactionEditorState {
 
   const TransactionSubmissionError({required this.message});
 }
+
+final class CurrencyLoading extends TransactionEditorState {}
+
+final class CurrencyLoaded extends TransactionEditorState {
+  final String currency;
+
+  const CurrencyLoaded({required this.currency});
+}
+
+final class CurrencyError extends TransactionEditorState {
+  final String message;
+
+  const CurrencyError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

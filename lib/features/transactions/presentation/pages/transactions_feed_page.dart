@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:xpens_flow/app/router/routes.dart';
 import 'package:xpens_flow/core/ui/format/date_format.dart';
 import 'package:xpens_flow/features/transactions/domain/entities/transaction.dart';
 import 'package:xpens_flow/features/transactions/presentation/state/feed/transaction_feed_bloc.dart';
@@ -111,7 +113,9 @@ class _TransactionsFeedPageState extends State<TransactionsFeedPage> {
                       borderRadius: BorderRadius.circular(AppSpacing.sm),
                     ),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.push(Routes.transactionAdd);
+                      },
                       icon: Icon(
                         Icons.add,
                         size: AppSpacing.size18,

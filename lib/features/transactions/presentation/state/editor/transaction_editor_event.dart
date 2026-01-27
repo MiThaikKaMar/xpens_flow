@@ -9,6 +9,8 @@ sealed class TransactionEditorEvent extends Equatable {
 
 final class LoadAllCategories extends TransactionEditorEvent {}
 
+final class LoadCurrency extends TransactionEditorEvent {}
+
 final class TransactionSubmit extends TransactionEditorEvent {
   final Transaction transaction;
 
